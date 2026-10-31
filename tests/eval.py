@@ -1,52 +1,65 @@
-"""Mesure la fiabilité de Gemma sur data/exemples_sms.json.
-Usage (depuis la racine du projet) :  python -m tests.eval
-Affiche le taux de bonnes détections : un chiffre à montrer au jury (critère 4)."""
+"""Mesure la fiabilité du scanner conformément au brief officiel (Section 9.5).
+Usage : python -m tests.eval
+"""
 import json
 import sys
 import time
 from pathlib import Path
+import requests
 
-from dotenv import load_dotenv
+ROOT = Path(__file__).resolve().parent.parent
+CASES_FILE = Path(__file__).resolve().parent / "cases.json"
+BASE_URL = "http://127.0.0.1:8000"
 
-load_dotenv()
-from backend import scanner  # noqa: E402
+s = requests.Session()
 
-items = json.loads((Path(__file__).resolve().parent.parent / "data" / "exemples_sms.json").read_text(encoding="utf-8"))
+# 1. Création compte de test temporaire
+pseudo = f"eval_{int(time.time())}"
+reg = s.post(f"{BASE_URL}/api/register", json={"pseudo": pseudo, "password": "password123", "lang": "fr"})
+if reg.status_code != 200:
+    print(f"Erreur d'inscription pour le test: {reg.text}")
+    sys.exit(1)
 
-MAX_RETRIES = 3
-DELAY_BETWEEN = 3  # secondes entre chaque appel pour éviter le rate-limit
+cases = json.loads(CASES_FILE.read_text(encoding="utf-8"))
 
-ok = 0
-faux_positifs = 0
-for idx, it in enumerate(items):
-    # Petit délai entre les appels (sauf le premier)
+ok_count = 0
+false_ok = 0
+
+print(f"\n--- Evaluation du scanner sur {len(cases)} cas réels & anonymisés ---")
+
+for idx, c in enumerate(cases):
     if idx > 0:
-        time.sleep(DELAY_BETWEEN)
-
-    # Retry en cas d'erreur transitoire (500, réseau…)
-    r = None
-    for attempt in range(1, MAX_RETRIES + 1):
-        try:
-            r = scanner.scan(it["texte"], None)
-            break
-        except Exception as e:
-            print(f"  ! {it['id']} tentative {attempt}/{MAX_RETRIES} echouee : {e}")
-            if attempt < MAX_RETRIES:
-                time.sleep(5 * attempt)  # backoff progressif
-            else:
-                print(f"  X {it['id']} abandonne apres {MAX_RETRIES} tentatives")
-                r = {"verdict": "illisible", "confiance": 0}
-
-    got = r["verdict"]
-    good = got == it["attendu"]
-    # Un "suspect" attendu accepte aussi "arnaque" ; jamais "legitime"
-    if it["attendu"] == "suspect" and got in ("suspect", "arnaque"):
+        time.sleep(2)
+    
+    data = {"text": c["text"], "sender": c.get("sender", ""), "lang": "fr"}
+    resp = s.post(f"{BASE_URL}/api/analyse", data=data)
+    
+    if resp.status_code != 200:
+        print(f"KO {c['id']:<20} Erreur API {resp.status_code}: {resp.text}")
+        continue
+    
+    res = resp.json()
+    verdict = res.get("verdict")
+    expected = c["expected"]
+    
+    good = (verdict == expected)
+    # Si 'douteux' attendu, accepter aussi 'arnaque' par mesure de sécurité
+    if expected == "douteux" and verdict in ("douteux", "arnaque"):
         good = True
-    ok += good
-    if it["attendu"] == "legitime" and got in ("arnaque",):
-        faux_positifs += 1
-    print(f"{'OK ' if good else 'KO '} {it['id']:<22} attendu={it['attendu']:<9} obtenu={got:<9} ({r['confiance']} %)")
+    
+    if expected == "arnaque" and verdict == "ok":
+        false_ok += 1
+        
+    if good:
+        ok_count += 1
+        
+    status = "OK " if good else "KO "
+    print(f"{status} {c['id']:<22} attendu={expected:<8} obtenu={verdict:<8} (Montant: {res.get('amount')})")
 
-print(f"\nBonnes détections : {ok}/{len(items)} ({100 * ok // len(items)} %)")
-print(f"Vrais SMS classés « arnaque » à tort : {faux_positifs}")
-sys.exit(0 if ok == len(items) else 1)
+rate = (ok_count * 100) // len(cases)
+print(f"\nScore final : {ok_count}/{len(cases)} ({rate}%)")
+print(f"Faux 'ok' sur arnaque (interdit par le brief) : {false_ok}")
+
+if false_ok > 0 or rate < 90:
+    sys.exit(1)
+sys.exit(0)
