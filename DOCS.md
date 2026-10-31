@@ -1,59 +1,88 @@
-# Vérif'SMS — Moov / T-Money Assistant & Fraude Scanner
+# Documentation Technique — Fraude Scanner
 
-Hackathon « Build with Gemma » · Hacktoberfest Lomé × LBS CS Club · 31 octobre 2026
+## Architecture
 
-Un site web où l'on colle (ou capture) un SMS Mobile Money et où **Gemma** dit, en français simple,
-s'il est authentique ou si c'est une arnaque. Un volet **Apprendre** (commandes `/`) permet de réviser un cours.
-
-## Principe : tout passe par Gemma
-Le code Python ne fait que **router** : message qui commence par `/` → mode Apprendre, sinon → scanner.
-Gemma fait tout le reste : lire la capture, extraire (expéditeur, montant, syntaxe), comparer aux vrais
-formats officiels, rendre le verdict et l'alerte, lire le cours, créer le plan, les quiz et corriger.
-Aucune règle de détection n'est codée côté Python. Sans clé Gemma, rien ne fonctionne.
-
-## Installation (5 minutes)
-```bash
-git clone <url-du-depot> && cd verif-sms
-python -m venv .venv
-source .venv/bin/activate        # Windows : .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env             # Windows : copy .env.example .env
-# ouvrir .env et coller la clé de https://aistudio.google.com/apikey
-uvicorn backend.main:app --reload
 ```
-Ouvrir http://localhost:8000. Test rapide de la clé : http://localhost:8000/api/sante
-
-## Mesurer la fiabilité
-```bash
-python -m tests.eval
+Browser (login.html / index.html)
+    |
+    | HTTP/REST
+    v
+FastAPI (backend/main.py) port 8000
+    |               |
+    v               v
+Gemma 4 26B    Supabase (PostgreSQL)
+(via AI SDK)   (users, scan_history, course_history)
 ```
 
-## 🛡️ Fonctionnalités Clés
-- **Scanner d'arnaques Mobile Money instantané** : Vérifie la légitimité des SMS T-Money et Moov Money (Mixx) grâce au modèle **Gemma**.
-- **Protection préventive sectorielle** : Spécifiquement conçu pour les réalités du Togo (vendeurs de marché, étudiants, secteur informel).
-- **Interface Mobile-First & Responsive** : Conçue pour une prise en main rapide avec boutons d'actions directs et support de synthèse vocale.
-- **Support multilingue local** : Alertes disponibles en Français, Éwé et Kabiyè.
-- **Volet Apprentissage interactif (`/apprendre`)** : Génération de quiz, plans d'étude sur mesure et fiches mémo à partir des cours de l'étudiant.
-- **Haute fiabilité mesurée** : Benchmark d'évaluation à 100% de détections réussies (15/15 cas vérifiés, 0 faux positif).
+## Variables d'environnement
 
-## À FAIRE par l'équipe (important)
-1. **Remplacer `data/references.json`** : ajouter de vrais SMS officiels T-Money / Moov Money **anonymisés**
-   (numéros remplacés par `90 00 00 0X`). C'est ce qui rend la comparaison de format fiable.
-2. Ajouter vos propres cas dans `data/exemples_sms.json` (attendu : legitime / suspect / arnaque) et relancer `python -m tests.eval`.
-3. Tester les captures d'écran (vraies photos de téléphone) avant la démo.
-4. Faire relire les traductions éwé / kabiyè par un locuteur, sinon les masquer.
+| Variable | Description | Exemple |
+|----------|-------------|---------|
+| GEMINI_API_KEY | Cle API Google AI | AQ.Ab8RN6... |
+| GEMMA_MODEL | Modele Gemma | gemma-4-26b-a4b-it |
+| SUPABASE_URL | URL du projet Supabase | https://xxx.supabase.co |
+| SUPABASE_KEY | Cle service_role Supabase | eyJ... |
 
-## Données et sécurité
-- Jamais de vrais numéros ni de vraies données personnelles : messages d'exemple ou anonymisés.
-- La clé API vit dans `.env` (ignoré par git). Ne jamais la publier.
-- Rien n'est enregistré sur disque : les sessions sont en mémoire et disparaissent à l'arrêt du serveur.
-- Le texte du SMS est traité comme une **donnée** (protection contre les SMS qui tenteraient de donner des ordres à l'IA).
-- Un SMS peut être falsifié : même « authentique », l'alerte conseille de vérifier le solde par le canal officiel.
+## Modèle de données
 
-## Structure
+### Table: users
+| Colonne | Type | Description |
+|---------|------|-------------|
+| pseudo | TEXT PK | Identifiant unique (insensible casse) |
+| salt | TEXT | Sel bcrypt encodé base64 |
+| hash | TEXT | Hash scrypt encodé base64 |
+| lang | TEXT | Langue par defaut (fr/ee/kbp/en) |
+| created_at | TIMESTAMPTZ | Date de creation |
+
+### Table: scan_history
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | BIGINT PK | Identifiant auto |
+| user_pseudo | TEXT FK | Reference utilisateur |
+| timestamp | TIMESTAMPTZ | Date de l'analyse |
+| sms_preview | TEXT | 80 premiers caracteres du SMS |
+| verdict | TEXT | ok / douteux / arnaque |
+| amount | TEXT | Montant extrait |
+| sender | TEXT | Expediteur affiché |
+| advice | TEXT | Conseil genere |
+
+### Table: course_history
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | BIGINT PK | Identifiant auto |
+| user_pseudo | TEXT FK | Reference utilisateur |
+| timestamp | TIMESTAMPTZ | Date de l'analyse |
+| course_name | TEXT | Nom du fichier cours |
+| last_command | TEXT | Derniere commande (/plan, /quiz...) |
+
+## Format de réponse /api/analyse
+
+```json
+{
+  "verdict": "ok|douteux|arnaque",
+  "amount": "5 000 FCFA",
+  "sender": "Moov Money",
+  "syntax": "Format Moov Money Mixx officiel",
+  "reasons": ["Raison 1", "Raison 2"],
+  "advice": "Ce message semble authentique...",
+  "advice_local": null,
+  "security_tip": "Regle d'or: jamais votre PIN..."
+}
 ```
-backend/  main.py (routage) · gemma.py (appels) · prompts.py · scanner.py · learning.py
-frontend/ index.html · style.css · app.js
-data/     references.json (formats officiels + arnaques) · exemples_sms.json (démo + tests)
-tests/    eval.py
-```
+
+## Sécurité
+
+- **Hachage** : scrypt (n=16384, r=8, p=1, dklen=32)
+- **Sessions** : token URLsafe 32 bytes, cookie HTTPOnly SameSite=Lax, TTL 8h
+- **Rate limiting** : 5 tentatives / 5 minutes par IP+pseudo
+- **Prompt injection** : contenu SMS encapsulé dans balises `<sms>` pour isolation
+- **PIN guard** : si SMS contient "pin/code secret/mot de passe" → forcé "arnaque"
+
+## Langues supportées
+
+| Code | Langue |
+|------|--------|
+| fr | Français (défaut) |
+| ee | Éwé (Togo) |
+| kbp | Kabiyè (Togo) |
+| en | English |
