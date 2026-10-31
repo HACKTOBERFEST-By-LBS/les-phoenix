@@ -95,8 +95,8 @@ def gen(contents, system: str, temperature: float = 0.2) -> str:
 # ---------- Base de donnÃ©es : Supabase (avec fallback SQLite) ----------
 SESSIONS: dict[str, dict] = {}
 FAILS: dict[str, list[float]] = {}
-SESSION_TTL = 8 * 3600
-LANGS = ("fr", "ee", "kbp", "en")
+SESSION_TTL = 8 * 3600  # 8 heures en secondes
+LANGS = ("fr", "ee", "kbp", "en")  # Langues supportees: Francais, Ewe, Kabiye, English
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
