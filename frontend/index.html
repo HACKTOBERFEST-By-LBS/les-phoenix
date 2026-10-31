@@ -90,6 +90,18 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
 .history-badge.v-arnaque{background:var(--red-bg);color:var(--red)}
 .history-preview{font-size:14px;font-weight:500;margin:4px 0}
 .history-advice{font-size:13px;color:var(--muted)}
+/* Zone d'upload d'image */
+.image-dropzone{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--bg);transition:all .15s;margin-top:14px;position:relative}
+.image-dropzone:hover,.image-dropzone.dragover{border-color:var(--navy);background:rgba(38,69,112,.05)}
+.image-dropzone p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.image-dropzone strong{font-size:14px;color:var(--ink)}
+.image-preview{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:12px}
+.image-preview img{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.image-preview .meta{flex:1;min-width:0;font-size:13px}
+.image-preview .meta strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.image-preview .meta span{color:var(--muted);font-size:12px}
+.image-preview button{background:none;border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;color:var(--red)}
+.image-preview button:hover{background:var(--red-bg);border-color:var(--red)}
 /* Dictionnaire */
 .dict-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s}
 .dict-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
@@ -158,14 +170,29 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
               <option value="en">Français + English</option>
             </select>
           </div>
-          <div class="row">
-            <input type="file" id="shot" accept="image/*" hidden>
-            <button class="btn ghost" id="shotBtn" type="button">Ajouter une capture</button>
-            <span class="hint" id="shotName" style="margin:0"></span>
-            <span class="sp"></span>
-            <button class="btn" id="go" type="button">Analyser</button>
+          <!-- Zone de téléversement d'image / capture d'écran -->
+          <div class="image-dropzone" id="dropzone" role="button" tabindex="0" title="Cliquez ou glissez une capture d'écran">
+            <span style="font-size:28px">📸</span>
+            <div><strong>Ajouter une capture d'écran</strong></div>
+            <p>Cliquez, glissez une image ici ou faites <kbd style="background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-family:monospace">Ctrl+V</kbd> pour coller</p>
           </div>
-          <p class="hint">Utilise seulement des messages d'exemple, jamais de vrais numéros. Tape <b>/apprendre</b> dans la zone du SMS pour ouvrir le mode Apprendre.</p>
+          <input type="file" id="shot" accept="image/png,image/jpeg,image/webp,image/jpg" hidden>
+
+          <!-- Aperçu de l'image sélectionnée -->
+          <div class="image-preview" id="imagePreview" hidden>
+            <img id="previewImg" src="" alt="Aperçu capture">
+            <div class="meta">
+              <strong id="previewName">capture.png</strong>
+              <span id="previewSize">0 Ko</span>
+            </div>
+            <button type="button" id="removeImgBtn" title="Retirer cette capture">✕ Retirer</button>
+          </div>
+
+          <div class="row" style="margin-top:16px">
+            <span class="sp"></span>
+            <button class="btn" id="go" type="button" style="padding:12px 28px;font-size:15px">🔍 Analyser</button>
+          </div>
+          <p class="hint">Collez le SMS ou ajoutez une capture d'écran (image). Tapez <b>/apprendre</b> dans la zone du message pour réviser un cours.</p>
         </div>
         <div class="card" id="out" aria-live="polite">
           <div class="empty">Le verdict s'affiche ici.</div>
@@ -297,8 +324,7 @@ $("logoutBtn").onclick = async () => {
 $("resetScanBtn").onclick = () => {
   $("sms").value = "";
   $("sender").value = "";
-  $("shot").value = "";
-  $("shotName").textContent = "";
+  clearImage();
   $("out").innerHTML = '<div class="empty">Le verdict s\u0027affiche ici.</div>';
 };
 
@@ -411,16 +437,84 @@ function render(r){
   };
 }
 
+let selectedImageFile = null;
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + " octets";
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " Ko";
+  return (bytes / 1048576).toFixed(1) + " Mo";
+}
+
+function setImageFile(file) {
+  if (!file || !file.type.startsWith("image/")) return;
+  selectedImageFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    $("previewImg").src = e.target.result;
+    $("previewName").textContent = file.name || "capture.png";
+    $("previewSize").textContent = formatFileSize(file.size);
+    $("imagePreview").hidden = false;
+    $("dropzone").hidden = true;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  selectedImageFile = null;
+  $("shot").value = "";
+  $("previewImg").src = "";
+  $("imagePreview").hidden = true;
+  $("dropzone").hidden = false;
+}
+
+$("dropzone").onclick = () => $("shot").click();
+$("shot").onchange = () => {
+  if ($("shot").files && $("shot").files[0]) {
+    setImageFile($("shot").files[0]);
+  }
+};
+$("removeImgBtn").onclick = e => {
+  e.stopPropagation();
+  clearImage();
+};
+
+// Support Drag & Drop
+$("dropzone").addEventListener("dragover", e => {
+  e.preventDefault();
+  $("dropzone").classList.add("dragover");
+});
+$("dropzone").addEventListener("dragleave", () => $("dropzone").classList.remove("dragover"));
+$("dropzone").addEventListener("drop", e => {
+  e.preventDefault();
+  $("dropzone").classList.remove("dragover");
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+    setImageFile(e.dataTransfer.files[0]);
+  }
+});
+
+// Support Ctrl+V (Coller du presse-papier)
+window.addEventListener("paste", e => {
+  if ($("viewScan").hidden) return;
+  const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for (const item of items) {
+    if (item.type.indexOf("image") === 0) {
+      const blob = item.getAsFile();
+      setImageFile(blob);
+      break;
+    }
+  }
+});
+
 async function lancer(){
   const esc = s => String(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
   const t = $("sms").value.trim();
   if (t.startsWith("/")) { show("learn"); $("sms").value = ""; commande(t); return; }
-  const file = $("shot").files[0];
+  const file = selectedImageFile || $("shot").files[0];
   if (!t && !file) {
-    $("out").innerHTML = '<div class="empty">Colle un SMS ou ajoute une capture, puis clique sur Analyser.</div>';
+    $("out").innerHTML = '<div class="empty">Colle un SMS ou ajoute une capture d\'écran (image), puis clique sur Analyser.</div>';
     return;
   }
-  $("out").innerHTML = '<div class="empty">⏳ Analyse Gemma en cours…</div>';
+  $("out").innerHTML = '<div class="empty">⏳ Analyse Gemma en cours (OCR + vérification du message)…</div>';
   $("go").disabled = true;
   try {
     const res = await analyserAvecGemma(t, file);
@@ -435,8 +529,6 @@ async function lancer(){
 $("go").onclick = lancer;
 $("sms").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey || e.target.value.startsWith("/"))) { e.preventDefault(); lancer(); } });
 document.querySelectorAll("[data-ex]").forEach(b => b.onclick = () => { $("sms").value = EX[b.dataset.ex]; $("sender").value = ""; });
-$("shotBtn").onclick = () => $("shot").click();
-$("shot").onchange = () => $("shotName").textContent = $("shot").files[0]?.name || "";
 
 /* ---------- Navigation ---------- */
 function show(v){
