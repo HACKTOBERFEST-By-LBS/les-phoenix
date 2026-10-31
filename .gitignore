@@ -8,3 +8,8 @@ venv/
 
 backend/data.db
 supabase_tables.sql
+# Logs et temp
+*.log
+__pycache__/
+*.pyc
+.DS_Store
