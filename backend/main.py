@@ -77,6 +77,7 @@ def parse_json(txt: str) -> dict:
     return json.loads(m.group(0))
 
 def gen(contents, system: str, temperature: float = 0.2) -> str:
+    """Appelle Gemma avec retry (3 tentatives, backoff 1.5s). Leve une exception apres 3 echecs."""
     for attempt in range(1, 4):
         try:
             r = get_client().models.generate_content(
