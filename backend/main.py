@@ -78,12 +78,19 @@ def parse_json(txt: str) -> dict:
     return json.loads(m.group(0))
 
 def gen(contents, system: str, temperature: float = 0.2) -> str:
-    r = get_client().models.generate_content(
-        model=MODEL,
-        contents=contents,
-        config=types.GenerateContentConfig(system_instruction=system, temperature=temperature),
-    )
-    return r.text or ""
+    for attempt in range(1, 4):
+        try:
+            r = get_client().models.generate_content(
+                model=MODEL,
+                contents=contents,
+                config=types.GenerateContentConfig(system_instruction=system, temperature=temperature),
+            )
+            return r.text or ""
+        except Exception as e:
+            if attempt == 3:
+                raise
+            time.sleep(1.5 * attempt)
+    return ""
 
 # ---------- Comptes et sessions ----------
 DB_PATH = Path(__file__).with_name("data.db")
