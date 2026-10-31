@@ -4,6 +4,42 @@ Toutes les modifications notables de ce projet sont documentées ici.
 
 ---
 
+## [1.3.0] — 2026-10-31
+
+### Ajouté
+- **Support fichiers enrichi** : PDF (pdfplumber), DOCX (python-docx), Markdown (.md), TXT dans `/api/course`
+  - PDF scannés : fallback automatique vers Gemini Files API
+  - Markdown : nettoyage automatique des balises (titres, gras, liens, images)
+- **Bot WhatsApp** (`/api/whatsapp`) : Webhook Twilio pour analyser les SMS suspects directement depuis WhatsApp
+  - Supporte texte et images (captures d'écran)
+  - Réponse structurée : verdict, montant, conseil, numéro officiel
+  - Endpoint `/api/whatsapp/status` pour vérifier la configuration
+- **Recherche web** (`/recherche <sujet>`) dans le mode Apprendre
+  - Propulsé par Gemini 2.0 Flash avec Google Search grounding
+  - Recherche actuelle sur les arnaques / Mobile Money / cybersécurité au Togo
+  - Fallback sans recherche si l'API Google Search est indisponible
+- **Dictionnaire des fraudes** (`/api/fraud-dictionary`) : 8 types d'arnaques documentées
+  - Signaux d'alerte, exemples de SMS réels, conseils de protection
+  - 4 Règles d'Or + numéros officiels (T-Money 888 / Moov 101)
+- **Onglet Dictionnaire** dans le frontend avec filtres par niveau de danger
+- **Badge WhatsApp** dans la sidebar : numéro sandbox Twilio affiché
+- **Section WhatsApp** dans l'onglet Historique : instructions d'activation
+- **SEARCH_MODEL** : `gemini-2.0-flash` dédié à la recherche web (distinct du modèle scanner)
+
+### Amélioré
+- `/api/learn` : nouvelle commande `/recherche` sans avoir besoin d'un cours
+- Interface chat : message de bienvenue amélioré avec toutes les commandes disponibles
+- Upload cours : message de confirmation avec le type de fichier affiché
+- Navigation : 4 onglets (Scanner, Apprendre, Dictionnaire, Historique)
+- `gen_with_search()` : double fallback (avec puis sans Google Search)
+
+### Technique
+- Packages ajoutés : `python-docx==1.2.0`, `pdfplumber==0.11.10`, `twilio==9.12.0`
+- Séparation claire : Gemma scanner SMS / Gemini Flash recherche web
+- Données : `data/dictionnaire_fraudes.json` (8 catégories, règles d'or, numéros officiels)
+
+---
+
 ## [1.2.0] — 2026-10-31
 
 ### Ajouté
