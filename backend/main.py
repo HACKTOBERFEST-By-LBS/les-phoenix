@@ -104,6 +104,7 @@ Réponds UNIQUEMENT avec ce JSON (sans markdown, sans texte autour) :
   "extracted_text":"texte intégral du SMS lu dans le message ou extrait de la capture d'écran",
   "amount":"montant extrait ou Aucun montant",
   "sender":"expéditeur affiché ou lu dans l'entête",
+  "operation_type":"Type d'opération (ex: Dépôt agent officiel, Retrait agent, Transfert P2P, Dépôt par erreur simulé, Hameçonnage, etc.)",
   "syntax":"description courte du format détecté",
   "ref_check":"référence trouvée et nombre de chiffres (ex: Ref 19801100001 = 11 chiffres OK)",
   "reasons":["raison 1","raison 2","raison 3"],
@@ -387,6 +388,55 @@ def logout(request: Request, response: Response):
 def me(user: dict = Depends(current_user)):
     return {"pseudo": user["pseudo"], "langue": user["lang"]}
 
+def classify_link(text: str) -> dict:
+    """Analyse et catégorise avec précision tout lien trouvé dans le message ou la capture."""
+    url_match = re.search(r"https?://[^\s]+|www\.[^\s]+|[a-zA-Z0-9\.\-]+\.(?:com|org|net|tg|info|biz|me|xyz|site|online|app)[^\s]*", text, re.I)
+    if not url_match:
+        return {
+            "found": False,
+            "url": None,
+            "type": "Aucun lien détecté",
+            "badge": "safe",
+            "details": "Aucun lien web ou adresse URL n'est présent dans ce message."
+        }
+    raw_url = url_match.group(0).rstrip(".,;:!?)'\"")
+    url_lower = raw_url.lower()
+
+    # Lien officiel Moov Mixx ou opérateurs togolais
+    if "onelink.to/czwadf" in url_lower or "togocom.tg" in url_lower or "moov-africa.tg" in url_lower:
+        return {
+            "found": True,
+            "url": raw_url,
+            "type": "Lien officiel certifié",
+            "badge": "ok",
+            "details": "Lien officiel vérifié de l'opérateur (téléchargement ou portail sécurisé)."
+        }
+    # Raccourcisseurs d'URL suspects
+    if re.search(r"bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly|rb\.gy|cutt\.ly|is\.gd|shorturl", url_lower):
+        return {
+            "found": True,
+            "url": raw_url,
+            "type": "Raccourcisseur masqué (Suspect)",
+            "badge": "warning",
+            "details": "Ce lien court masque l'adresse réelle de destination. Technique fréquente pour cacher des sites frauduleux."
+        }
+    # Lien non sécurisé ou d'hameçonnage
+    if url_lower.startswith("http://") or re.search(r"free|gift|tontine|gagne|bonus|promo|claim|login|verify", url_lower):
+        return {
+            "found": True,
+            "url": raw_url,
+            "type": "Lien d'hameçonnage / Phishing",
+            "badge": "danger",
+            "details": "Lien hautement suspect conçu pour subtiliser vos accès ou vos fonds Mobile Money. Ne cliquez pas."
+        }
+    return {
+        "found": True,
+        "url": raw_url,
+        "type": "Lien externe non officiel",
+        "badge": "warning",
+        "details": "Lien vers un site externe non répertorié parmi les plateformes officielles."
+    }
+
 # ---- Route Scanner ----
 
 @app.post("/api/analyse")
@@ -492,13 +542,58 @@ async def analyse(
     if re.fullmatch(r"(\+?228)?[\s\-]?[97]\d[\s\-]?\d{2}[\s\-]?\d{2}[\s\-]?\d{2}", sender_clean) and verdict == "ok":
         verdict = "douteux"
 
+    # ── Analyse approfondie du lien URL (si présent) ────────────────────────
+    link_info = classify_link(combined_text)
+    if link_info["badge"] == "danger":
+        verdict = "arnaque"
+    elif link_info["badge"] == "warning" and verdict == "ok":
+        verdict = "douteux"
+
+    # ── Calcul de l'indice de risque (0 à 100%) ──────────────────────────────
+    if verdict == "arnaque":
+        risk_score = 98 if (link_info["badge"] == "danger" or re.search(r"\bpin\b|code secret", txt_lower)) else 92
+    elif verdict == "douteux":
+        risk_score = 65 if link_info["found"] else 48
+    else:
+        risk_score = 5
+
+    # ── Détection du type d'opération ────────────────────────────────────────
+    op_type = str(data.get("operation_type") or "").strip()
+    if not op_type or op_type.lower() in ("inconnu", "none", "non précisé", "type d'opération"):
+        if re.search(r"\bpin\b|code secret|mot de passe", txt_lower):
+            op_type = "Tentative d'hameçonnage (Vol de code PIN)"
+        elif re.search(r"erreur|renvoi|accident", txt_lower) and "dépôt" in txt_lower:
+            op_type = "Faux dépôt avec demande de renvoi"
+        elif re.search(r"gagn|loterie|concours|tirage", txt_lower):
+            op_type = "Escroquerie faux concours / gain"
+        elif "dépôt" in txt_lower or "depot" in txt_lower:
+            op_type = "Dépôt d'argent (Mobile Money)"
+        elif "retrait" in txt_lower:
+            op_type = "Retrait d'argent"
+        elif "reçu" in txt_lower or "recu" in txt_lower:
+            op_type = "Transfert / Réception de fonds"
+        else:
+            op_type = "Notification de transaction"
+
+    # ── Canal d'assistance officiel selon l'opérateur détecté ────────────────
+    if re.search(r"moov|mixx", combined_text, re.I):
+        emergency_contact = "Service Client Moov Money : 101 (gratuit)"
+    elif re.search(r"t-money|tmoney|togocom|yas", combined_text, re.I):
+        emergency_contact = "Service Client T-Money : 888 (gratuit)"
+    else:
+        emergency_contact = "Assistance Togo : T-Money (888) / Moov Money (101)"
+
     # ── Construction de la réponse ───────────────────────────────────────────
     res = {
         "verdict": verdict,
+        "risk_score": risk_score,
+        "operation_type": op_type,
         "amount": str(data.get("amount") or "Aucun montant trouvé"),
         "sender": str(data.get("sender") or sender or "Non précisé"),
         "syntax": str(data.get("syntax") or "Format non reconnu"),
         "ref_check": str(data.get("ref_check") or "Référence non trouvée"),
+        "link_analysis": link_info,
+        "emergency_contact": emergency_contact,
         "extracted_text": extracted_text,
         "reasons": [str(x) for x in (data.get("reasons") or [])][:4],
         "advice": str(data.get("advice") or "Vérifie ton solde dans ton application officielle."),
