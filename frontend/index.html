@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -316,6 +316,7 @@ function render(r){
 }
 
 async function lancer(){
+  const esc = s => String(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
   const t = $("sms").value.trim();
   if (t.startsWith("/")) { show("learn"); $("sms").value = ""; commande(t); return; }
   const file = $("shot").files[0];

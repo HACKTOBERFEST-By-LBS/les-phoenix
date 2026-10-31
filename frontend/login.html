@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -225,7 +225,7 @@ form.addEventListener("submit", async e => {
     const user = create ? await creerCompte({ pseudo, motDePasse: pass, langue })
                         : await connecter({ pseudo, motDePasse: pass });
     store("pseudo", user.pseudo); store("langue", user.langue);
-    $("pass").value = $("pass2").value = "";
+    $("pass").value = ""; try { $("pass2").value = ""; } catch(e) {}
     form.hidden = true; $("done").hidden = false;
     $("doneTitle").textContent = (create ? "Accès créé. Bienvenue, " : "Bonjour, ") + user.pseudo + ".";
     $("doneText").textContent = create ? "Tu peux maintenant vérifier un SMS Mobile Money suspect." : "Ton scanner est prêt.";

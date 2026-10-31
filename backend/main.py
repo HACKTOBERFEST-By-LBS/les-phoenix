@@ -166,6 +166,10 @@ def db_create_user(pseudo: str, salt: bytes, hash_val: bytes, lang: str):
     sb = get_supabase()
     if sb:
         import base64
+        # Vérifier d'abord si le pseudo existe (Supabase retourne 409 comme erreur API)
+        existing = sb.table("users").select("pseudo").ilike("pseudo", pseudo).execute()
+        if existing.data:
+            raise ValueError("Pseudo déjà pris")
         r = sb.table("users").insert({
             "pseudo": pseudo,
             "salt": base64.b64encode(salt).decode(),
