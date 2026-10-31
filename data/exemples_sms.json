@@ -1,92 +1,10 @@
-[
-  {
-    "id": "legit-depot-agent",
-    "titre": "Dépôt chez un agent Moov",
-    "attendu": "legitime",
-    "texte": "Dépôt de 5 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 01-10-26 13:21. Frais: 0 FCFA. Nouveau solde Mixx : 7 500 FCFA . Ref: 19801100001."
-  },
-  {
-    "id": "legit-retrait-agent",
-    "titre": "Retrait chez un agent Moov",
-    "attendu": "legitime",
-    "texte": "Vous avez retire 10 000 FCFA auprès de l'agent 90002(BOUTIQUE ADAMA MARCHE), le 24-10-26 10:46. Frais: 200 FCFA. Frais remboursés: 0 FCFA. Nouveau solde: 5 300 FCFA. Ref: 20222400002."
-  },
-  {
-    "id": "legit-recharge",
-    "titre": "Recharge forfait Moov",
-    "attendu": "legitime",
-    "texte": "Vous avez recharge le forfait NET599+ (599 FCFA FCFA) pour votre numéro, le 21-10-26 21:55. Frais: 0 FCFA FCFA. Nouveau solde: 101 FCFA FCFA. Ref: 20180200003 Découvrez la nvelle appli Mixx: https://onelink.to/czwadf"
-  },
-  {
-    "id": "legit-reception-intl",
-    "titre": "Réception internationale Moov",
-    "attendu": "legitime",
-    "texte": "Vous avez reçu 15 000 FCFA du 90 00 00 04 (FRANCE) le 2026-10-31. Votre nouveau solde Mixx : 22 500 FCFA. Ref: 20342400004"
-  },
-  {
-    "id": "legit-retrait-gros",
-    "titre": "Gros retrait Moov",
-    "attendu": "legitime",
-    "texte": "Vous avez retire 99 000 FCFA auprès de l'agent 90003(KIOSQUE MARCHE CENTRAL), le 24-10-26 10:46. Frais: 1 000 FCFA. Frais remboursés: 0 FCFA. Nouveau solde: 101 FCFA. Ref: 20222492930."
-  },
-  {
-    "id": "legit-recu-tmoney",
-    "titre": "Argent reçu T-Money",
-    "attendu": "legitime",
-    "texte": "Vous avez recu 7 500 FCFA de AMA K. (90 00 00 11) le 31/10/2026 a 11:20. Nouveau solde : 19 800 FCFA. ID de transaction : 2610311120934."
-  },
-  {
-    "id": "arnaque-erreur-simple",
-    "titre": "Dépôt par erreur classique",
-    "attendu": "arnaque",
-    "texte": "Bonjour, j'ai fait un depot de 30 000F sur votre compte par erreur. Merci de me renvoyer l'argent au 90 00 00 21 c'est urgent, je suis malade."
-  },
-  {
-    "id": "arnaque-faux-depot-mixx",
-    "titre": "Faux SMS Moov + demande de renvoi",
-    "attendu": "arnaque",
-    "texte": "Dépôt de 50 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 31-10-26 08:12. Frais: 0 FCFA. Nouveau solde Mixx : 52 300 FCFA . Ref: 123. Erreur de depot, veuillez renvoyer 50 000 FCFA au 90 00 00 08."
-  },
-  {
-    "id": "arnaque-faux-recu-mixx",
-    "titre": "Faux réception Mixx + renvoi",
-    "attendu": "arnaque",
-    "texte": "Vous avez reçu 30 000 FCFA du 90 00 00 09 (TOGO) le 2026-10-31. Votre nouveau solde Mixx : 30 500 FCFA. Ref: 20342400099. SVP c'est une erreur, renvoie moi vite au 90 00 00 09."
-  },
-  {
-    "id": "arnaque-concours",
-    "titre": "Faux concours Moov",
-    "attendu": "arnaque",
-    "texte": "FELICITATIONS! Vous avez gagne 2 000 000 FCFA au grand concours Moov Money. Pour recevoir votre lot envoyez 15 000 FCFA de frais de dossier au 96 00 00 23. Appelez vite!"
-  },
-  {
-    "id": "arnaque-blocage-mixx",
-    "titre": "Compte Mixx « bloqué »",
-    "attendu": "arnaque",
-    "texte": "Cher client, votre compte Mixx sera BLOQUE dans 24h. Confirmez votre code secret sur http://moov-mixx-verif.example/login pour eviter la suspension."
-  },
-  {
-    "id": "arnaque-tontine",
-    "titre": "Fausse tontine",
-    "attendu": "arnaque",
-    "texte": "Tontine Solidarite 2026 : vous etes selectionne(e). Cotisez 10 000 FCFA aujourd'hui, vous recevrez 100 000 FCFA demain. Place limitee. Envoyez au 97 00 00 24."
-  },
-  {
-    "id": "arnaque-pin-moov",
-    "titre": "Faux service client Moov demande PIN",
-    "attendu": "arnaque",
-    "texte": "Service Moov Money : une erreur sur votre retrait de 99 000 FCFA chez l'agent 39963. Envoyez votre code PIN au 8555 pour correction."
-  },
-  {
-    "id": "arnaque-faux-retrait-mixx",
-    "titre": "Faux retrait Moov + appel",
-    "attendu": "arnaque",
-    "texte": "Vous avez retire 45 000 FCFA auprès de l'agent 90002(BOUTIQUE ADAMA MARCHE), le 31-10-26 09:00. Frais: 500 FCFA. Frais remboursés: 0 FCFA. Nouveau solde: 200 FCFA. Ref: 456. Si vous n'etes pas a l'origine, appelez le 90 00 00 30 immediatement."
-  },
-  {
-    "id": "suspect-promo-lien",
-    "titre": "Promo avec lien raccourci",
-    "attendu": "suspect",
-    "texte": "Cher client Mixx, offre exceptionnelle : rechargez 10 000 FCFA et gagnez un bonus. Details : bit.ly/promo-mixx"
-  }
+﻿[
+  {"id": "tmoney_depot_ok", "sms": "Depot de 10000 FCFA recu sur votre compte T-Money le 31/10/2026 a 14h00. Nouveau solde: 15000 FCFA.", "sender": "T-Money", "verdict_attendu": "ok"},
+  {"id": "faux_gain_concours", "sms": "Vous avez gagne 500000 FCFA! Envoyez 5000 FCFA de frais pour recevoir votre gain. Contactez le 90000001.", "sender": "Inconnu", "verdict_attendu": "arnaque"},
+  {"id": "fausse_tontine", "sms": "Bonjour votre tour de tontine est arrive. Versez 20000 FCFA au 90000002 avant ce soir.", "sender": "Inconnu", "verdict_attendu": "arnaque"},
+  {"id": "demande_pin", "sms": "Votre compte T-Money sera bloque. Confirmez votre PIN au 90000003 pour eviter la suspension.", "sender": "T-Money", "verdict_attendu": "arnaque"},
+  {"id": "moov_officiel_ok", "sms": "Depot de 5000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 31-10-26 13:21. Frais: 0 FCFA. Nouveau solde Mixx : 7500 FCFA . Ref: 19801100001.", "sender": "Moov Money", "verdict_attendu": "ok"},
+  {"id": "faux_remboursement", "sms": "Nous vous remboursons 50000 FCFA suite a une erreur systeme. Confirmez votre numero au 90000004.", "sender": "Inconnu", "verdict_attendu": "arnaque"},
+  {"id": "ref_courte_piege", "sms": "Depot de 25000 FCFA. Frais: 0 FCFA. Ref: 123. Renvoyer au 90000005 svp.", "sender": "Moov Money", "verdict_attendu": "arnaque"},
+  {"id": "lien_suspect", "sms": "Votre Mobile Money est suspendu. Cliquez ici pour reactivr: http://bit.ly/moov-tg", "sender": "Inconnu", "verdict_attendu": "arnaque"}
 ]
