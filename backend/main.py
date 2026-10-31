@@ -281,7 +281,9 @@ def current_user(request: Request) -> dict:
         raise HTTPException(401, "Connecte-toi d'abord.")
     return s
 
-# ---- Routes Auth ----
+# ═══════════════════════════════════════════════
+# Routes Auth : /api/register /api/login /api/logout /api/me
+# ═══════════════════════════════════════════════
 
 @app.post("/api/register")
 def register(req: AuthReq, response: Response):
