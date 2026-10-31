@@ -1,24 +1,10 @@
-# secrets
 .env
-.env.*
-!.env.example
-
-# node
-node_modules/
-dist/
-build/
-.next/
-.vercel/
-
-# python
+data/vrais_sms_bruts.md
 __pycache__/
 *.pyc
 .venv/
 venv/
-
-# éditeurs et système
-.vscode/
-.idea/
 .DS_Store
-Thumbs.db
-*.log
+
+backend/data.db
+supabase_tables.sql
