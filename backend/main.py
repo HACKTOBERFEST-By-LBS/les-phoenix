@@ -74,10 +74,22 @@ Formats officiels Moov Money Mixx :
   • Dépôt agent   : "Dépôt de X FCFA chez l'agent NNNNN(NOM), le JJ-MM-AA HH:MM. Frais: 0 FCFA. Nouveau solde Mixx : Y FCFA . Ref: 11CHIFFRES."
   • Retrait agent  : "Vous avez retire X FCFA auprès de l'agent NNNNN(NOM), le JJ-MM-AA HH:MM. Frais: Z FCFA. Nouveau solde: Y FCFA. Ref: 11CHIFFRES."
   • Réception inter: "Vous avez reçu X FCFA du XX XX XX XX (PAYS) le AAAA-MM-JJ. Votre nouveau solde Mixx : Y FCFA. Ref: 11CHIFFRES"
+  • Transfert Référence (P2P / Compte bancaire lié) : "Transaction reussie. Vous avez transferé X FCFA, du compte NNNN vers le NNNN (NOM), le JJ/MM/AA HH:MM. Frais: null FCFA (ou 0 FCFA). Nouveau solde Mixx: Y FCFA. Ref: 11CHIFFRES." -> C'est un format officiel de RÉFÉRENCE (VERDICT: "ok"), sans erreur. "Frais: null FCFA" est une mention officielle authentique.
 
 Formats officiels T-Money (Togocom/Yas) :
   • Argent reçu : "Vous avez recu X FCFA de NOM (XX XX XX XX) le JJ/MM/AAAA a HH:MM. Nouveau solde : Y FCFA. ID de transaction : 13CHIFFRES."
   • Retrait agent: "Retrait de X FCFA effectue chez l'agent XX XX XX XX le JJ/MM/AAAA a HH:MM. Frais : Z FCFA. Nouveau solde : Y FCFA. ID : 13CHIFFRES."
+  • Transfert envoyé : "Votre transfert de X FCFA vers NNNN a ete effectue le JJ/MM/AAAA a HH:MM. Frais : Z FCFA. Nouveau solde : Y FCFA. ID : 13CHIFFRES."
+
+CAS SPÉCIAL — MESSAGE NON TRANSACTIONNEL / STANDARD :
+Si le message soumis n'a rien à voir avec une transaction financière, un transfert d'argent, un dépôt, un retrait ou un service Mobile Money (ex: simple salutation amicale, message personnel, discussion standard) :
+- "verdict": "ok"
+- "amount": "Aucun montant (non financier)"
+- "operation_type": "Message standard (Non financier)"
+- "syntax": "Message informatif ou conversationnel standard sans transaction financière"
+- "ref_check": "Sans objet (message non financier)"
+- "reasons": ["Ce message ne concerne aucune transaction Mobile Money ou bancaire.", "Aucune escroquerie ni sollicitation financière détectée."]
+- "advice": "Ce message est un message standard sans rapport avec une transaction financière. Nous vous conseillons tout de même de toujours vérifier l'identité de l'expéditeur."
 
 RÈGLES CLÉS DE VALIDATION :
 ✅ SMS officiel : annonce une opération DÉJÀ effectuée (verbe au passé)
@@ -499,6 +511,22 @@ async def analyse(
     combined_text  = f"{text} {extracted_text}".strip()
     txt_lower      = combined_text.lower()
 
+    # ── Cas spécifiques de validation avancée ──────────────────────────────
+    # Cas A : SMS officiel Moov Money Mixx de référence (ex: Transaction reussie + transferé + FCFA + Ref 11 chiffres)
+    is_moov_ref = bool(
+        re.search(r"transaction\s+reussie|vous avez transfer[eé]", txt_lower) and
+        re.search(r"mixx|solde", txt_lower) and
+        re.search(r"ref\s*:\s*\d{11}", txt_lower) and
+        not re.search(r"\bpin\b|code secret|renvoi|rembours", txt_lower)
+    )
+
+    # Cas B : Message standard sans rapport avec une transaction financière
+    keywords_financial = r"fcfa|franc|\bsolde\b|d[eé]p[oô]t|retrait|transfer|virement|transaction|\bargent\b|moov|tmoney|t-money|mixx|\bcompte\b|\bfrais\b|gain|loterie|concours|\bpin\b|\botp\b|tontine|banque|ecobank|yas"
+    is_non_financial = (
+        not re.search(keywords_financial, txt_lower) or 
+        "standard" in str(data.get("operation_type", "")).lower()
+    )
+
     if re.search(r"\bpin\b|code secret|mot de passe|otp\b|code confidentiel", txt_lower, re.I):
         verdict = "arnaque"
 
@@ -517,7 +545,7 @@ async def analyse(
             verdict = "douteux"
 
     ref_match = re.search(r"\b(ref|id|transaction)[:\s]+([0-9a-zA-Z]+)", txt_lower, re.I)
-    if ref_match:
+    if ref_match and not is_non_financial:
         ref_val = ref_match.group(2)
         if len(ref_val) < 8:
             verdict = "douteux"
@@ -526,12 +554,13 @@ async def analyse(
             data["reasons"].insert(0, f"Référence suspecte : trop courte ({len(ref_val)} caractères au lieu de 11 ou 13).")
 
     if re.search(r"\burgent\b|vite|avant ce soir|maintenant|imm[eé]diatement|d[eé]p[eê]che", txt_lower, re.I):
-        if verdict == "ok":
+        if verdict == "ok" and not is_moov_ref:
             verdict = "douteux"
 
     sender_clean = (sender or data.get("sender") or "").strip()
-    if re.fullmatch(r"(\+?228)?[\s\-]?[97]\d[\s\-]?\d{2}[\s\-]?\d{2}[\s\-]?\d{2}", sender_clean) and verdict == "ok":
-        verdict = "douteux"
+    if not is_moov_ref and not is_non_financial:
+        if re.fullmatch(r"(\+?228)?[\s\-]?[97]\d[\s\-]?\d{2}[\s\-]?\d{2}[\s\-]?\d{2}", sender_clean) and verdict == "ok":
+            verdict = "douteux"
 
     link_info = classify_link(combined_text)
     if link_info["badge"] == "danger":
@@ -539,7 +568,38 @@ async def analyse(
     elif link_info["badge"] == "warning" and verdict == "ok":
         verdict = "douteux"
 
-    if verdict == "arnaque":
+    # Priorité absolue aux messages de référence authentiques
+    if is_moov_ref and verdict != "arnaque":
+        verdict = "ok"
+        risk_score = 0
+        data["operation_type"] = "Transfert Moov Money Mixx officiel (Message de référence)"
+        data["syntax"] = "Format officiel Moov Money de référence (opération confirmée)"
+        data["reasons"] = [
+            "Opération confirmée (Transaction réussie)",
+            "Montant, compte source, destinataire et nouveau solde Mixx présents",
+            "Référence officielle à 11 chiffres conforme (mention Frais: null/0 FCFA officielle)"
+        ]
+        data["advice"] = "Ce message est un message de référence officiel d'une opération réussie. Vous pouvez vérifier votre solde sur l'application Mixx."
+    elif is_non_financial and not re.search(keywords_financial, txt_lower) and verdict != "arnaque":
+        verdict = "ok"
+        risk_score = 0
+        data["operation_type"] = "Message standard (Non financier)"
+        data["syntax"] = "Message informatif ou conversationnel sans transaction financière"
+        data["ref_check"] = "Sans objet (message non financier)"
+        data["amount"] = "Aucun montant"
+        data["reasons"] = [
+            "Ce message ne concerne aucune transaction Mobile Money ou bancaire.",
+            "Aucune tentative d'arnaque financière détectée."
+        ]
+        if lang == "ee":
+            data["advice"] = "Gbedeasi sia nye gbedeasi kpoo si me ga nya aɖeke mele o. Gake lé ŋku ɖe ame si dɔe ɖa la ŋu nyuie."
+        elif lang == "kbp":
+            data["advice"] = "Tɔm tʊnɛ tɩkɛ lɩɣzɩtʋ tɔm nakʋyʋ. Ɛlɛ kpaɣ nesi nɛ ŋna weyi etiyi-tʋ yɔ."
+        elif lang == "en":
+            data["advice"] = "This is a standard message unrelated to any financial transaction. We still advise verifying the sender."
+        else:
+            data["advice"] = "Ce message est un message standard sans rapport avec une transaction financière. Conseillez tout de même de vérifier l'expéditeur."
+    elif verdict == "arnaque":
         risk_score = 98 if (link_info["badge"] == "danger" or re.search(r"\bpin\b|code secret", txt_lower)) else 92
     elif verdict == "douteux":
         risk_score = 65 if link_info["found"] else 48

@@ -9,6 +9,7 @@ Ces modèles authentiques anonymisés servent de référence absolue de syntaxe 
 - [Moov Money / Recharge Forfait] Vous avez recharge le forfait NET599+ (599 FCFA FCFA) pour votre numéro, le 21-10-26 21:55. Frais: 0 FCFA FCFA. Nouveau solde: 101 FCFA FCFA. Ref: 20180200003 Découvrez la nvelle appli Mixx: https://onelink.to/czwadf
 - [Moov Money / Reception Internationale] Vous avez reçu 15 000 FCFA du 90 00 00 04 (FRANCE) le 2026-10-31. Votre nouveau solde Mixx : 22 500 FCFA. Ref: 20342400004
 - [Moov Money / Gros Retrait] Vous avez retire 99 000 FCFA auprès de l'agent 90003(KIOSQUE MARCHE CENTRAL), le 24-10-26 10:46. Frais: 1 000 FCFA. Frais remboursés: 0 FCFA. Nouveau solde: 101 FCFA. Ref: 20222492930.
+- [Moov Money / Transfert Compte Bancaire ou P2P Référence] Transaction reussie. Vous avez transferé 24600 FCFA, du compte ECOCTGTG90012026050981 vers le 91927911 (Emmanuella N ZINSOU), le 28/10/26 16:49. Frais: null FCFA. Nouveau solde Mixx: 3068 FCFA. Ref: 20297542348. (Note : ce format avec compte bancaire lié et "Frais: null FCFA" ou "Frais: 0 FCFA" est un authentique SMS officiel de référence Moov Mixx).
 
 ## 2. T-Money Togo (Togocom / Yas)
 

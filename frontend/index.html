@@ -139,6 +139,8 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
           <div class="row">
             <span class="hint" style="margin:0">Exemples de démo :</span>
             <button class="chip" data-ex="ok">Dépôt Moov</button>
+            <button class="chip" data-ex="transfert_ref">Transfert Moov (Réf)</button>
+            <button class="chip" data-ex="standard">Message standard</button>
             <button class="chip" data-ex="erreur">Faux dépôt</button>
             <button class="chip" data-ex="piege">Faux officiel</button>
             <button class="chip" data-ex="concours">Faux concours</button>
@@ -313,6 +315,8 @@ $("resetLearnBtn").onclick = () => {
 
 const EX = {
   ok: "Dépôt de 5 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 01-10-26 13:21. Frais: 0 FCFA. Nouveau solde Mixx : 7 500 FCFA . Ref: 19801100001.",
+  transfert_ref: "Transaction reussie. Vous avez transferé 24600 FCFA, du compte ECOCTGTG90012026050981 vers le 91927911 (Emmanuella N ZINSOU), le 28/10/26 16:49. Frais: null FCFA. Nouveau solde Mixx: 3068 FCFA. Ref: 20297542348.",
+  standard: "Bonjour mon frère, est-ce que tu es disponible cet après-midi pour qu'on avance sur le projet de cours ? Dis-moi dès que tu lis ceci.",
   erreur: "Bonjour, j'ai fait un depot de 25 000F sur votre compte par erreur. Merci de me renvoyer l'argent au 90 00 00 04 c'est urgent.",
   piege: "Dépôt de 50 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 31-10-26 08:12. Frais: 0 FCFA. Nouveau solde Mixx : 52 300 FCFA . Ref: 123. Erreur de depot, veuillez renvoyer 50 000 FCFA au 90 00 00 08.",
   concours: "FELICITATIONS! Vous avez gagne 2 000 000 FCFA au grand concours Moov Money. Pour recevoir votre lot envoyez 15 000 FCFA de frais de dossier au 96 00 00 23. Appelez vite!"
