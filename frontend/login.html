@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Connexion – Fraude Scanner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F9; --surface:#fff; --line:#D3DBE7; --ink:#17223A; --muted:#5B6780;
+  --navy:#264570; --side:#1D3557; --red:#8B0000; --red-bg:#FBEDED; --green:#1F6B47; --green-bg:#E8F4EE;
+  --btn-ink:#fff; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1828; --surface:#15243A; --line:#2A3C57; --ink:#E8EEF8; --muted:#97A5BE;
+  --navy:#8FB0E0; --side:#0A1220; --red:#FF8A8A; --red-bg:#3A1C22; --green:#6FD3A0; --green-bg:#16332A;
+  --btn-ink:#0E1828; color-scheme:dark;}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:16px/1.5 "Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
+button,input{font:inherit;color:inherit}
+.page{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);min-height:100%}
+
+/* côté gauche */
+.hero{position:relative;background:var(--side);color:#E6EEFA;display:flex;flex-direction:column;justify-content:space-between;padding:32px clamp(24px,4vw,56px);overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero>*:not(canvas){position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:#fff}
+.brand i{width:12px;height:12px;border-radius:50%;background:#E24B4B;box-shadow:0 0 0 5px rgba(226,75,75,.25)}
+.hero h1{margin:0 0 14px;font-size:clamp(28px,3.6vw,44px);line-height:1.12;letter-spacing:-.02em;color:#fff;max-width:14em}
+.hero p{margin:0;max-width:34ch;opacity:.85}
+.hero .foot{font-size:13.5px;opacity:.65;max-width:40ch}
+
+/* côté droit */
+.panel{display:flex;align-items:center;justify-content:center;padding:32px clamp(16px,4vw,48px)}
+.box{width:100%;max-width:420px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 4px;margin-right:18px;margin-bottom:-1px;cursor:pointer;color:var(--muted);font-weight:500}
+.tab[aria-selected=true]{color:var(--ink);font-weight:600;border-bottom-color:var(--red)}
+h2{margin:0 0 6px;font-size:26px;line-height:1.2;letter-spacing:-.01em}
+.lead{margin:0 0 24px;color:var(--muted)}
+.field{margin-bottom:16px}
+label,.lbl{display:block;font-weight:600;font-size:14.5px;margin-bottom:6px}
+.inp{display:flex;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.inp:focus-within{border-color:var(--navy);box-shadow:0 0 0 3px rgba(38,69,112,.18)}
+.inp input{flex:1;min-width:0;border:0;background:none;padding:12px;outline:none}
+.inp button{background:none;border:0;padding:0 14px;color:var(--navy);font-weight:600;cursor:pointer;font-size:14px}
+.field.bad .inp{border-color:var(--red)}
+.err{margin:6px 0 0;font-size:13.5px;color:var(--red);min-height:0}
+.err:empty{display:none}
+.hint{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{margin:0;font-weight:500;padding:8px 16px;border:1px solid var(--line);border-radius:999px;cursor:pointer;background:var(--surface);font-size:15px}
+.seg input:checked+label{border-color:var(--navy);background:var(--navy);color:var(--btn-ink);font-weight:600}
+.seg input:focus-visible+label{outline:2px solid var(--navy);outline-offset:2px}
+.check{display:flex;gap:10px;align-items:flex-start;margin:4px 0 4px}
+.check input{margin-top:4px;width:18px;height:18px;accent-color:var(--navy)}
+.check label{font-weight:400;margin:0;font-size:14.5px}
+.go{width:100%;margin-top:18px;background:var(--navy);color:var(--btn-ink);border:0;border-radius:8px;padding:14px;font-weight:700;cursor:pointer;font-size:16px}
+.go:disabled{opacity:.6;cursor:wait}
+.go:focus-visible,.tab:focus-visible,.inp button:focus-visible,.link:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.note{margin-top:22px;padding:12px 14px;border-left:4px solid var(--red);background:var(--red-bg);border-radius:0 8px 8px 0;font-size:14.5px}
+.link{background:none;border:0;padding:0;color:var(--navy);text-decoration:underline;cursor:pointer;font-size:14.5px}
+.only-create{display:block}
+form[data-mode=login] .only-create{display:none}
+form[data-mode=create] .only-login{display:none}
+.done{text-align:left}
+.done .ok{display:inline-flex;width:44px;height:44px;border-radius:50%;background:var(--green-bg);color:var(--green);align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
+[hidden]{display:none!important}
+@media(max-width:820px){
+  .page{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .hero{padding:max(20px,env(safe-area-inset-top)) 22px 22px;gap:18px}
+  .hero p,.hero .foot{display:none}
+  .hero h1{font-size:24px;margin:0}
+  .panel{align-items:flex-start;padding-bottom:max(32px,env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <canvas id="bg" aria-hidden="true"></canvas>
+    <div class="brand"><i></i>Fraude Scanner</div>
+    <div>
+      <h1>Vérifie le SMS avant d’envoyer ton argent.</h1>
+      <p>Colle un message Mobile Money suspect. En quelques secondes, tu sais s’il est vrai ou si c’est une arnaque.</p>
+    </div>
+    <p class="foot">Utilise seulement des messages d’exemple. Ne saisis jamais de vrais numéros.</p>
+  </section>
+
+  <main class="panel">
+    <div class="box">
+      <div class="tabs" role="tablist" aria-label="Type de connexion">
+        <button class="tab" role="tab" id="tabCreate" aria-selected="true">Première connexion</button>
+        <button class="tab" role="tab" id="tabLogin" aria-selected="false">J’ai déjà un compte</button>
+      </div>
+
+      <form id="form" data-mode="create" novalidate>
+        <h2 id="title">Bienvenue. Crée ton accès.</h2>
+        <p class="lead" id="lead">Choisis un pseudo et un mot de passe. Pas besoin de ton numéro de téléphone.</p>
+
+        <div class="field" id="f-pseudo">
+          <label for="pseudo">Pseudo</label>
+          <div class="inp"><input id="pseudo" type="text" autocomplete="username" maxlength="30" aria-describedby="e-pseudo"></div>
+          <p class="err" id="e-pseudo" role="alert"></p>
+        </div>
+
+        <div class="field" id="f-pass">
+          <label for="pass">Mot de passe</label>
+          <div class="inp">
+            <input id="pass" type="password" autocomplete="new-password" aria-describedby="e-pass">
+            <button type="button" id="show" aria-controls="pass">Afficher</button>
+          </div>
+          <p class="hint only-create">6 caractères minimum.</p>
+          <p class="err" id="e-pass" role="alert"></p>
+        </div>
+
+        <div class="field only-create" id="f-pass2">
+          <label for="pass2">Confirme le mot de passe</label>
+          <div class="inp"><input id="pass2" type="password" autocomplete="new-password" aria-describedby="e-pass2"></div>
+          <p class="err" id="e-pass2" role="alert"></p>
+        </div>
+
+        <div class="field only-create">
+          <span class="lbl" id="langLbl">Langue des alertes</span>
+          <div class="seg" role="radiogroup" aria-labelledby="langLbl">
+            <input type="radio" name="lang" id="l-fr" value="fr" checked><label for="l-fr">Français</label>
+            <input type="radio" name="lang" id="l-ee" value="ee"><label for="l-ee">Éwé</label>
+            <input type="radio" name="lang" id="l-kbp" value="kbp"><label for="l-kbp">Kabiyè</label>
+          </div>
+        </div>
+
+        <div class="field only-create" id="f-ok">
+          <div class="check">
+            <input type="checkbox" id="ok" aria-describedby="e-ok">
+            <label for="ok">Je comprends que le logiciel donne un avis et ne remplace pas mon application Mobile Money.</label>
+          </div>
+          <p class="err" id="e-ok" role="alert"></p>
+        </div>
+
+        <p class="err" id="e-form" role="alert"></p>
+        <button class="go" id="go" type="submit">Créer mon accès</button>
+        <p class="hint" style="margin-top:14px">
+          <span class="only-create">Tu as déjà un compte ? <button type="button" class="link" id="toLogin">Se connecter</button></span>
+          <span class="only-login">C’est ta première fois ? <button type="button" class="link" id="toCreate">Créer mon accès</button></span>
+        </p>
+      </form>
+
+      <div class="done" id="done" hidden>
+        <span class="ok" aria-hidden="true">✓</span>
+        <h2 id="doneTitle"></h2>
+        <p class="lead" id="doneText"></p>
+        <button class="go" id="open" type="button" style="margin-top:0">Ouvrir le scanner</button>
+        <p class="hint" id="openMsg" role="status"></p>
+      </div>
+
+      <div class="note">Ce logiciel ne te demandera <b>jamais</b> ton code secret T-Money ou Moov Money.</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const form = $("form");
+
+// Vérification session active au chargement
+(async () => {
+  try {
+    const r = await fetch("/api/me");
+    if (r.ok) { location.replace("/"); }
+  } catch(e) {}
+})();
+
+async function appel(url, body) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof d.detail === "string" ? d.detail : "Connexion impossible pour le moment. Réessaie.");
+  return d;
+}
+async function creerCompte({ pseudo, motDePasse, langue }) { return appel("/api/register", { pseudo, password: motDePasse, lang: langue }); }
+async function connecter({ pseudo, motDePasse }) { return appel("/api/login", { pseudo, password: motDePasse }); }
+function ouvrirApp() { location.href = "/"; }
+
+function store(k, v) {
+  try { if (v === undefined) return localStorage.getItem("fs_" + k); localStorage.setItem("fs_" + k, v); } catch (e) {}
+  return null;
+}
+
+function setMode(m) {
+  form.dataset.mode = m;
+  const create = m === "create";
+  $("tabCreate").setAttribute("aria-selected", create); $("tabLogin").setAttribute("aria-selected", !create);
+  $("title").textContent = create ? "Bienvenue. Crée ton accès." : "Content de te revoir.";
+  $("lead").textContent = create ? "Choisis un pseudo et un mot de passe. Pas besoin de ton numéro de téléphone."
+                                 : "Entre ton pseudo et ton mot de passe.";
+  $("go").textContent = create ? "Créer mon accès" : "Se connecter";
+  $("pass").autocomplete = create ? "new-password" : "current-password";
+  clearErrors();
+}
+$("tabCreate").onclick = $("toCreate").onclick = () => setMode("create");
+$("tabLogin").onclick = $("toLogin").onclick = () => setMode("login");
+$("show").onclick = () => {
+  const t = $("pass").type === "password"; $("pass").type = t ? "text" : "password"; $("show").textContent = t ? "Masquer" : "Afficher";
+};
+
+function setErr(id, msg) { $("e-" + id).textContent = msg || ""; const f = $("f-" + id); if (f) f.classList.toggle("bad", !!msg); }
+function clearErrors() { ["pseudo", "pass", "pass2", "ok", "form"].forEach(i => setErr(i, "")); }
+
+form.addEventListener("submit", async e => {
+  e.preventDefault(); clearErrors();
+  const create = form.dataset.mode === "create";
+  const pseudo = $("pseudo").value.trim(), pass = $("pass").value;
+  let bad = null;
+  if (pseudo.length < 2) { setErr("pseudo", "Ton pseudo doit avoir au moins 2 lettres."); bad = bad || "pseudo"; }
+  if (pass.length < (create ? 6 : 1)) { setErr("pass", create ? "Ton mot de passe doit avoir au moins 6 caractères." : "Entre ton mot de passe."); bad = bad || "pass"; }
+  if (create && pass !== $("pass2").value) { setErr("pass2", "Les deux mots de passe ne sont pas pareils."); bad = bad || "pass2"; }
+  if (create && !$("ok").checked) { setErr("ok", "Coche cette case pour continuer."); bad = bad || "ok"; }
+  if (bad) { $(bad).focus(); return; }
+
+  const langue = (form.querySelector("input[name=lang]:checked") || {}).value || "fr";
+  $("go").disabled = true; $("go").textContent = "Un instant…";
+  try {
+    const user = create ? await creerCompte({ pseudo, motDePasse: pass, langue })
+                        : await connecter({ pseudo, motDePasse: pass });
+    store("pseudo", user.pseudo); store("langue", user.langue);
+    $("pass").value = $("pass2").value = "";
+    form.hidden = true; $("done").hidden = false;
+    $("doneTitle").textContent = (create ? "Accès créé. Bienvenue, " : "Bonjour, ") + user.pseudo + ".";
+    $("doneText").textContent = create ? "Tu peux maintenant vérifier un SMS Mobile Money suspect." : "Ton scanner est prêt.";
+    $("open").onclick = () => ouvrirApp(); $("open").focus();
+  } catch (err) {
+    setErr("form", err.message || "Connexion impossible pour le moment. Réessaie.");
+  } finally {
+    $("go").disabled = false; $("go").textContent = create ? "Créer mon accès" : "Se connecter";
+  }
+});
+
+const known = store("pseudo");
+if (known) { setMode("login"); $("pseudo").value = known; }
+
+(function () {
+  const cv = $("bg"), ctx = cv.getContext("2d"), GAP = 32, BAND = 140;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let w, h, dots = [];
+  function size() {
+    const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    w = r.width; h = r.height; cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dots = [];
+    for (let y = GAP / 2; y < h; y += GAP) for (let x = GAP / 2; x < w; x += GAP) dots.push({ x, y, f: 0 });
+    draw(0);
+  }
+  function draw(t) {
+    ctx.clearRect(0, 0, w, h);
+    const sy = ((t * 0.04) % (h + BAND * 2)) - BAND;
+    for (const d of dots) {
+      let k = Math.max(0, 1 - Math.abs(d.y - (sy + Math.sin(d.x * 0.008 + t * 0.0006) * 24)) / BAND); k *= k;
+      if (!reduce && d.f <= 0 && k > 0.85 && Math.random() < 0.0015) d.f = 1;
+      if (d.f > 0) {
+        d.f -= 0.006;
+        ctx.fillStyle = "rgba(255,110,110," + (0.4 + 0.6 * d.f) + ")";
+        ctx.beginPath(); ctx.arc(d.x, d.y, 3.2, 0, 6.2832); ctx.fill();
+        ctx.strokeStyle = "rgba(255,110,110," + (0.5 * d.f) + ")"; ctx.beginPath(); ctx.arc(d.x, d.y, 6 + (1 - d.f) * 16, 0, 6.2832); ctx.stroke();
+      } else {
+        ctx.fillStyle = "rgba(190,212,245," + (0.14 + 0.6 * k) + ")";
+        ctx.beginPath(); ctx.arc(d.x, d.y, 1.3 + k * 2.2, 0, 6.2832); ctx.fill();
+      }
+    }
+  }
+  addEventListener("resize", size); size();
+  if (!reduce) (function loop(t) { draw(t); requestAnimationFrame(loop); })(0);
+})();
+</script>
+</body>
+</html>

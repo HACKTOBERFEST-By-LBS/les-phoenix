@@ -1,100 +1,404 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vérif'SMS – Ce SMS Mobile Money est-il vrai ?</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fraude Scanner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F9; --surface:#fff; --line:#DDE3EC; --ink:#17223A; --muted:#5B6780;
+  --navy:#264570; --side:#1D3557; --side-ink:#DCE6F5;
+  --red:#8B0000; --red-bg:#FBEDED; --green:#1F6B47; --green-bg:#E8F4EE; --amber:#9A6200; --amber-bg:#FBF3E1;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1828; --surface:#15243A; --line:#25364F; --ink:#E8EEF8; --muted:#97A5BE;
+  --navy:#8FB0E0; --side:#0A1220; --side-ink:#B8C7DE;
+  --red:#FF8A8A; --red-bg:#3A1C22; --green:#6FD3A0; --green-bg:#16332A; --amber:#F0C060; --amber-bg:#3A2F14; color-scheme:dark;}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:15px/1.5 "Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
+button,input,textarea,select{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:230px 1fr;height:100%}
+aside{background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;padding:22px 14px;gap:6px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 22px;font-weight:700;font-size:17px;color:#fff}
+.brand i{width:12px;height:12px;border-radius:50%;background:#E24B4B;box-shadow:0 0 0 5px rgba(226,75,75,.22)}
+.nav{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:1px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:3px solid transparent}
+.nav:hover{background:rgba(255,255,255,.06)}
+.nav[aria-current=true]{background:rgba(255,255,255,.1);border-left-color:#E24B4B;color:#fff}
+.nav b{font-weight:600}.nav small{opacity:.7;font-size:12.5px}
+.nav:focus-visible,button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.side-foot{margin-top:auto;padding:12px 10px 0;font-size:12.5px;opacity:.85;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;gap:6px}
+.side-user{font-weight:600;color:#fff}
+.side-logout{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;text-align:center;font-size:12px}
+.side-logout:hover{background:rgba(255,255,255,.1)}
+main{overflow:auto;padding:30px clamp(16px,4vw,44px);background-image:radial-gradient(rgba(38,69,112,.13) 1.2px,transparent 1.2px);background-size:30px 30px}
+h1{margin:0 0 4px;font-size:clamp(22px,3vw,30px);line-height:1.2;letter-spacing:-.01em}
+.sub{margin:0 0 22px;color:var(--muted);max-width:60ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+label{font-weight:600;font-size:14px;display:block;margin-bottom:6px}
+textarea,input[type=text],select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 12px}
+textarea{min-height:150px;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chip{background:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:13.5px;color:var(--muted)}
+.chip:hover{border-color:var(--navy);color:var(--navy)}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:11px 20px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+:root:not([data-theme="light"]) .btn{color:#0E1828}
+.btn.ghost{background:none;color:var(--navy);border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:wait}
+.sp{flex:1}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0}
+.empty{color:var(--muted);text-align:center;padding:42px 12px}
+.verdict{border-left:6px solid;border-radius:8px;padding:14px 16px;margin-bottom:16px}
+.verdict h2{margin:0;font-size:22px}.verdict p{margin:4px 0 0}
+.v-arnaque{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.v-douteux{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
+.v-ok{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.verdict p{color:var(--ink)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0 0 16px}
+dt{color:var(--muted)}dd{margin:0;font-weight:600}
+h3{font-size:14px;margin:14px 0 6px}
+ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
+.advice{margin-top:14px;padding:12px 14px;background:var(--bg);border-radius:8px;font-weight:500}
+.advice-local{margin-top:10px;padding:10px 12px;border:1.5px dashed var(--line);border-radius:8px;font-size:14px}
+.advice-local small{display:block;color:var(--muted);margin-bottom:2px}
+.chat{display:flex;flex-direction:column;height:min(620px,calc(100vh - 150px))}
+.log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px 12px}
+.msg{max-width:78ch;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--line);white-space:pre-wrap}
+.msg.me{align-self:flex-end;background:var(--navy);color:#fff;border-color:var(--navy)}
+:root:not([data-theme="light"]) .msg.me{color:#0E1828}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.cmdbar{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.cmdbar input{flex:1}
+.cmds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.cmds .chip{font-family:ui-monospace,Menlo,Consolas,monospace}
+[hidden]{display:none!important}
+@media(max-width:860px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  aside{flex-direction:row;align-items:center;padding:10px 12px;overflow-x:auto;padding-top:max(10px,env(safe-area-inset-top))}
+  .brand{padding:0 10px 0 4px}.nav small,.side-foot{display:none}
+  .grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:no-preference){.verdict{animation:in .25s ease-out}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
+</style>
 </head>
-<body>
-
-  <!-- ===== HEADER ===== -->
-  <header class="header">
-    <div class="header-left">
-      <div class="logo">🛡️ Vérif'SMS</div>
-      <div class="tagline">Protège-toi des arnaques Mobile Money</div>
+<body hidden>
+<div class="app">
+  <aside>
+    <div class="brand"><i></i>Fraude Scanner</div>
+    <button class="nav" id="navScan" aria-current="true"><b>Vérifier un SMS</b><small>Mode par défaut</small></button>
+    <button class="nav" id="navLearn" aria-current="false"><b>Apprendre</b><small>S’active avec une commande /</small></button>
+    <div class="side-foot">
+      <div class="side-user" id="userDisplay">Utilisateur</div>
+      <button class="side-logout" id="logoutBtn">Se déconnecter</button>
     </div>
-    <div class="header-right">
-      <div class="mode-badge" id="mode" role="status" aria-live="polite">Scanner</div>
-      <select id="langue" class="lang-select" aria-label="Langue">
-        <option value="fr">🇫🇷 FR</option>
-        <option value="ewe">🇹🇬 Éwé</option>
-        <option value="kabiye">🇹🇬 Kabiyè</option>
-      </select>
-    </div>
-  </header>
+  </aside>
 
-  <!-- ===== MAIN ===== -->
-  <main class="main">
-
-    <!-- Écran d'accueil -->
-    <section id="welcome" class="welcome">
-      <div class="hero">
-        <div class="hero-icon">🔍</div>
-        <h1>Un SMS d'argent te fait douter ?</h1>
-        <p class="hero-sub">Colle le texte ou envoie une capture.<br>Gemma te dit en secondes si c'est vrai ou faux.</p>
+  <main>
+    <!-- ===== SCANNER ===== -->
+    <section id="viewScan">
+      <h1>Ce SMS est-il vrai ?</h1>
+      <p class="sub">Colle le texte d’un SMS Mobile Money ou ajoute une capture d’écran. Tu as la réponse en quelques secondes.</p>
+      <div class="grid">
+        <div class="card">
+          <label for="sms">Le SMS reçu</label>
+          <textarea id="sms" placeholder="Colle ici le message…"></textarea>
+          <div class="row">
+            <span class="hint" style="margin:0">Exemples de démo :</span>
+            <button class="chip" data-ex="ok">Dépôt Moov</button>
+            <button class="chip" data-ex="erreur">Faux dépôt</button>
+            <button class="chip" data-ex="piege">Faux officiel</button>
+            <button class="chip" data-ex="concours">Faux concours</button>
+          </div>
+          <div style="margin-top:14px">
+            <label for="sender">Nom affiché en haut du SMS (si tu le vois)</label>
+            <input type="text" id="sender" placeholder="Exemple : T-Money, Moov Money…">
+          </div>
+          <div style="margin-top:14px">
+            <label for="langSelect">Langue de l'alerte</label>
+            <select id="langSelect">
+              <option value="fr">Français</option>
+              <option value="ee">Français + Éwé (test)</option>
+              <option value="kbp">Français + Kabiyè (test)</option>
+            </select>
+          </div>
+          <div class="row">
+            <input type="file" id="shot" accept="image/*" hidden>
+            <button class="btn ghost" id="shotBtn" type="button">Ajouter une capture</button>
+            <span class="hint" id="shotName" style="margin:0"></span>
+            <span class="sp"></span>
+            <button class="btn" id="go" type="button">Analyser</button>
+          </div>
+          <p class="hint">Utilise seulement des messages d’exemple, jamais de vrais numéros. Tape <b>/apprendre</b> dans la zone du SMS pour ouvrir le mode Apprendre.</p>
+        </div>
+        <div class="card" id="out" aria-live="polite">
+          <div class="empty">Le verdict s’affiche ici.</div>
+        </div>
       </div>
-
-      <!-- Boutons d'action principaux -->
-      <div class="action-grid">
-        <button type="button" class="action-card" id="btnScan">
-          <span class="action-icon">📱</span>
-          <span class="action-title">Scanner un SMS</span>
-          <span class="action-desc">Colle un SMS suspect</span>
-        </button>
-        <button type="button" class="action-card" id="btnPhoto">
-          <span class="action-icon">📸</span>
-          <span class="action-title">Envoyer une capture</span>
-          <span class="action-desc">Photo ou capture d'écran</span>
-        </button>
-        <button type="button" class="action-card" id="btnLearn">
-          <span class="action-icon">📚</span>
-          <span class="action-title">Réviser un cours</span>
-          <span class="action-desc">Quiz, plan, fiches</span>
-        </button>
-        <button type="button" class="action-card" id="btnExamples">
-          <span class="action-icon">💡</span>
-          <span class="action-title">Exemples</span>
-          <span class="action-desc">Tester avec des SMS</span>
-        </button>
-      </div>
-
-      <!-- Exemples (cachés par défaut) -->
-      <div class="examples-panel" id="examplesPanel" hidden>
-        <h3>Essaie avec un exemple :</h3>
-        <div class="samples" id="samples"></div>
-      </div>
-
-      <p class="privacy">🔒 Aucune donnée n'est enregistrée. Utilise des messages d'exemple, sans vrai numéro.</p>
     </section>
 
-    <!-- Fil de discussion -->
-    <div id="thread" class="thread" aria-live="polite"></div>
-
+    <!-- ===== APPRENDRE ===== -->
+    <section id="viewLearn" hidden>
+      <h1>Apprendre avec ton cours</h1>
+      <p class="sub">Rien ne se passe sans commande. Tape <b>/stop</b> à tout moment pour revenir au scanner.</p>
+      <div class="card chat">
+        <div class="log" id="log" aria-live="polite"></div>
+        <div class="cmds">
+          <button class="chip" data-cmd="/apprendre">/apprendre</button>
+          <button class="chip" data-cmd="/plan">/plan</button>
+          <button class="chip" data-cmd="/quiz">/quiz</button>
+          <button class="chip" data-cmd="/resume">/resume</button>
+          <button class="chip" data-cmd="/stop">/stop</button>
+        </div>
+        <div class="cmdbar">
+          <input type="text" id="cmd" placeholder="Tape une commande qui commence par /" autocomplete="off">
+          <input type="file" id="course" accept=".pdf,image/*,.txt" hidden>
+          <button class="btn ghost" id="courseBtn" type="button">Téléverser le cours</button>
+          <button class="btn" id="send" type="button">Envoyer</button>
+        </div>
+      </div>
+    </section>
   </main>
+</div>
 
-  <!-- ===== COMPOSER ===== -->
-  <footer class="composer" id="composerBar">
-    <div class="chips" id="chips"></div>
-    <div id="preview" class="preview" hidden></div>
-    <form id="form" class="input-row" autocomplete="off">
-      <label class="attach-btn" title="Joindre une capture, une photo ou un PDF">
-        <input type="file" id="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" hidden>
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12.5 12.6 21a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.5 8.5a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      </label>
-      <textarea id="msg" rows="1" placeholder="Colle le SMS ici…" aria-label="Message"></textarea>
-      <button type="submit" id="send" class="send-btn">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 20v-6l18-2-18-2V4l22 8z" fill="currentColor"/></svg>
-      </button>
-    </form>
-    <div class="composer-actions">
-      <button type="button" class="quick-btn" id="qHome" title="Accueil">🏠</button>
-    </div>
-  </footer>
+<script>
+const $ = id => document.getElementById(id);
 
-  <script src="app.js"></script>
+// Protection de l'interface & récupération session
+(async () => {
+  try {
+    const r = await fetch("/api/me");
+    if (!r.ok) { location.replace("/login.html"); return; }
+    window.ME = await r.json();
+    $("userDisplay").textContent = window.ME.pseudo;
+    if (window.ME.langue && $("langSelect")) {
+      $("langSelect").value = window.ME.langue;
+    }
+    document.body.hidden = false;
+  } catch(e) {
+    location.replace("/login.html");
+  }
+})();
+
+$("logoutBtn").onclick = async () => {
+  await fetch("/api/logout", { method: "POST" });
+  location.href = "/login.html";
+};
+
+const EX = {
+  ok: "Dépôt de 5 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 01-10-26 13:21. Frais: 0 FCFA. Nouveau solde Mixx : 7 500 FCFA . Ref: 19801100001.",
+  erreur: "Bonjour, j'ai fait un depot de 25 000F sur votre compte par erreur. Merci de me renvoyer l'argent au 90 00 00 04 c'est urgent.",
+  piege: "Dépôt de 50 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 31-10-26 08:12. Frais: 0 FCFA. Nouveau solde Mixx : 52 300 FCFA . Ref: 123. Erreur de depot, veuillez renvoyer 50 000 FCFA au 90 00 00 08.",
+  concours: "FELICITATIONS! Vous avez gagne 2 000 000 FCFA au grand concours Moov Money. Pour recevoir votre lot envoyez 15 000 FCFA de frais de dossier au 96 00 00 23. Appelez vite!"
+};
+
+async function analyserAvecGemma(texte, image){
+  const fd = new FormData();
+  fd.append("text", texte);
+  fd.append("sender", $("sender").value.trim());
+  fd.append("lang", $("langSelect")?.value || (window.ME ? window.ME.langue : "fr"));
+  if (image) fd.append("image", image);
+  const r = await fetch("/api/analyse", { method: "POST", body: fd });
+  if (r.status === 401) { location.replace("/login.html"); return; }
+  if (!r.ok) throw new Error((await r.json()).detail || "Erreur d'analyse");
+  return r.json();
+}
+
+const TITLES = {
+  arnaque: ["C’est une arnaque", "N’agis pas. Ce message cherche à te prendre de l’argent."],
+  douteux: ["Message douteux", "Certains signes sont inquiétants. Prudence."],
+  ok: ["Message probablement vrai", "Je n’ai pas trouvé de signe d’arnaque."]
+};
+
+function render(r){
+  const [h, p] = TITLES[r.verdict] || TITLES.douteux;
+  const esc = s => String(s || "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  const localAdv = r.advice_local ? `<div class="advice-local"><small>Traduction locale (expérimentale) :</small>${esc(r.advice_local)}</div>` : "";
+  $("out").innerHTML =
+    `<div class="verdict v-${r.verdict}"><h2>${h}</h2><p>${p}</p></div>
+     <dl>
+       <dt>Montant</dt><dd>${esc(r.amount)}</dd>
+       <dt>Expéditeur</dt><dd>${esc(r.sender)}</dd>
+       <dt>Format</dt><dd>${esc(r.syntax)}</dd>
+     </dl>
+     ${r.reasons && r.reasons.length ? `<h3>Pourquoi</h3><ul class="why">${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+     <div class="advice"><strong>Que faire : </strong>${esc(r.advice)}</div>
+     ${localAdv}
+     <div style="margin-top:14px; display:flex; gap:8px;">
+       <button class="btn ghost" type="button" id="copyBtn">📋 Copier l'alerte</button>
+       <button class="btn ghost" type="button" id="speakBtn">🔊 Écouter</button>
+     </div>`;
+
+  $("copyBtn").onclick = () => {
+    const txt = `${h}\n${p}\nConseil : ${r.advice}`;
+    navigator.clipboard.writeText(txt).then(() => alert("Alerte copiée !"));
+  };
+  $("speakBtn").onclick = () => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(`${h}. ${p}. ${r.advice}`);
+      u.lang = "fr-FR";
+      window.speechSynthesis.speak(u);
+    }
+  };
+}
+
+async function lancer(){
+  const t = $("sms").value.trim();
+  if (t.startsWith("/")) { show("learn"); $("sms").value = ""; commande(t); return; }
+  const file = $("shot").files[0];
+  if (!t && !file) {
+    $("out").innerHTML = '<div class="empty">Colle un SMS ou ajoute une capture, puis clique sur Analyser.</div>';
+    return;
+  }
+  $("out").innerHTML = '<div class="empty">⏳ Analyse Gemma en cours…</div>';
+  $("go").disabled = true;
+  try {
+    const res = await analyserAvecGemma(t, file);
+    if (res) render(res);
+  } catch(err) {
+    $("out").innerHTML = `<div class="empty" style="color:var(--red)">Impossible d’analyser pour le moment (${esc(err.message)}). Réessaie.</div>`;
+  } finally {
+    $("go").disabled = false;
+  }
+}
+
+$("go").onclick = lancer;
+$("sms").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey || e.target.value.startsWith("/"))) { e.preventDefault(); lancer(); } });
+document.querySelectorAll("[data-ex]").forEach(b => b.onclick = () => { $("sms").value = EX[b.dataset.ex]; $("sender").value = ""; });
+$("shotBtn").onclick = () => $("shot").click();
+$("shot").onchange = () => $("shotName").textContent = $("shot").files[0]?.name || "";
+
+/* ---------- Navigation ---------- */
+function show(v){
+  $("viewScan").hidden = v !== "scan"; $("viewLearn").hidden = v !== "learn";
+  $("navScan").setAttribute("aria-current", v === "scan"); $("navLearn").setAttribute("aria-current", v === "learn");
+  if (v === "learn" && !$("log").children.length) say("Mode Apprendre. Je n’agis que sur commande.\nTape /apprendre pour téléverser ton cours.");
+}
+$("navScan").onclick = () => show("scan");
+$("navLearn").onclick = () => show("learn");
+
+/* ---------- Apprendre (intégré avec /api/learn et /api/course) ---------- */
+let currentCourseId = null, currentCourseName = null;
+let weakTopics = [];
+let quizQuestions = [], quizIdx = -1;
+
+function say(t, me){
+  const d = document.createElement("div"); d.className = "msg" + (me ? " me" : ""); d.textContent = t;
+  $("log").append(d); $("log").scrollTop = 1e9; return d;
+}
+function needCourse(){
+  if (currentCourseId) return false;
+  say("Il me faut d’abord ton cours. Tape /apprendre puis téléverse un fichier."); return true;
+}
+
+async function commande(c){
+  c = c.trim(); if (!c) return;
+  say(c, true);
+  if (!c.startsWith("/")) { say("Je n’agis que sur commande. Tape / pour voir les commandes."); return; }
+  const parts = c.split(/\s+/);
+  const k = parts[0].toLowerCase();
+  const arg = parts.slice(1).join(" ");
+
+  if (k === "/stop") { quizIdx = -1; show("scan"); return; }
+  if (k === "/apprendre") {
+    say("Mode apprentissage activé. Téléverse ton cours (PDF, photo ou texte) avec le bouton « Téléverser le cours » ci-dessous.");
+    return;
+  }
+  if (k === "/plan" || k === "/resume") {
+    if (needCourse()) return;
+    say("⏳ Gemma prépare ta fiche / ton plan…");
+    try {
+      const res = await fetch("/api/learn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: k, course_id: currentCourseId, exam_date: arg || null, weak_topics: weakTopics })
+      });
+      if (res.status === 401) { location.replace("/login.html"); return; }
+      const data = await res.json();
+      say(data.reply || "Génération terminée.");
+    } catch(e) {
+      say("Erreur lors de la génération. Réessaie.");
+    }
+    return;
+  }
+  if (k === "/quiz") {
+    if (needCourse()) return;
+    say("⏳ Gemma prépare ton quiz adaptatif…");
+    try {
+      const res = await fetch("/api/learn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: "/quiz", course_id: currentCourseId, weak_topics: weakTopics })
+      });
+      if (res.status === 401) { location.replace("/login.html"); return; }
+      const data = await res.json();
+      quizQuestions = data.questions || [];
+      if (quizQuestions.length) {
+        quizIdx = 0;
+        poser();
+      } else {
+        say("Impossible de générer le quiz. Réessaie.");
+      }
+    } catch(e) {
+      say("Erreur lors de la préparation du quiz.");
+    }
+    return;
+  }
+  say("Commande inconnue. Essaie /apprendre, /plan, /quiz, /resume ou /stop.");
+}
+
+function poser(){
+  const Q = quizQuestions[quizIdx];
+  const d = say(`[Question ${quizIdx + 1}/${quizQuestions.length}] ${Q.q}`);
+  const box = document.createElement("div"); box.className = "opts";
+  (Q.options || []).forEach((txt, i) => {
+    const b = document.createElement("button"); b.className = "chip"; b.textContent = txt;
+    b.onclick = () => {
+      box.remove();
+      say(txt, true);
+      const isOk = (i === Q.answer);
+      if (isOk) {
+        say("✅ Bonne réponse ! " + (Q.why || ""));
+      } else {
+        say("❌ Pas tout à fait. " + (Q.why || ""));
+        if (Q.topic && !weakTopics.includes(Q.topic)) weakTopics.push(Q.topic);
+      }
+      if (++quizIdx < quizQuestions.length) {
+        poser();
+      } else {
+        quizIdx = -1;
+        say("🏁 Quiz terminé !" + (weakTopics.length ? " Notions à retravailler : " + weakTopics.join(", ") : " Excellent score !"));
+      }
+    };
+    box.append(b);
+  });
+  d.append(box); $("log").scrollTop = 1e9;
+}
+
+$("send").onclick = () => { commande($("cmd").value); $("cmd").value = ""; };
+$("cmd").addEventListener("keydown", e => { if (e.key === "Enter") $("send").click(); });
+document.querySelectorAll("[data-cmd]").forEach(b => b.onclick = () => commande(b.dataset.cmd));
+$("courseBtn").onclick = () => $("course").click();
+$("course").onchange = async () => {
+  const f = $("course").files[0];
+  if (!f) return;
+  say(`Envoi du cours « ${f.name} » à Gemma…`);
+  const fd = new FormData();
+  fd.append("file", f);
+  try {
+    const res = await fetch("/api/course", { method: "POST", body: fd });
+    if (res.status === 401) { location.replace("/login.html"); return; }
+    const d = await res.json();
+    currentCourseId = d.course_id;
+    currentCourseName = d.name;
+    say(`Cours bien reçu : ${d.name}. Tape /plan, /quiz ou /resume.`);
+  } catch(e) {
+    say("Erreur de téléversement du cours.");
+  }
+};
+</script>
 </body>
 </html>
