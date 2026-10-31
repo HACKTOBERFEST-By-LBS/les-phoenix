@@ -1,9 +1,9 @@
-# Fraude Scanner — Les Phoenix 🦅
+# GEM.FRAUDE.SCAN — Les Phoenix 🦅
 
 **Hackathon "Build with Gemma" — Lomé Business School, 31 Oct 2026**  
 **Équipe : les-phoenix**
 
-> Scanner anti-arnaque Mobile Money pour le Togo (T-Money / Moov Money) propulsé par Gemma AI.
+> **GEM.FRAUDE.SCAN** — Scanner anti-arnaque Mobile Money pour le Togo (T-Money / Moov Money) propulsé par Gemma AI.
 
 ---
 

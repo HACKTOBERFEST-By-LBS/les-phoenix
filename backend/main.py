@@ -41,7 +41,7 @@ def get_client():
 # ══════════════════════════════════════════════════════════════════════════════
 # APP & CONSTANTES
 # ══════════════════════════════════════════════════════════════════════════════
-app     = FastAPI(title="Fraude Scanner v1.3")
+app     = FastAPI(title="GEM.FRAUDE.SCAN v1.3")
 COURSES: dict[str, dict] = {}
 FENCE   = "`" * 3
 
@@ -838,7 +838,7 @@ async def whatsapp_webhook(
                 f"💡 Conseil: {advice}\n\n"
                 f"📞 Service officiel: {hotline}\n"
                 f"🔐 *Jamais votre PIN par SMS ou téléphone!*\n\n"
-                f"_Fraude Scanner — Les Phoenix | Hackathon Build with Gemma_"
+                f"_GEM.FRAUDE.SCAN — Les Phoenix | Hackathon Build with Gemma_"
             )
 
         except Exception:
