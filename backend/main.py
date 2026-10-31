@@ -377,7 +377,7 @@ async def analyse(
         "reasons": [str(x) for x in (data.get("reasons") or [])][:4],
         "advice": str(data.get("advice") or "VÃ©rifie ton solde dans ton application officielle."),
         "advice_local": data.get("advice_local"),
-        "security_tip": "ðŸ” RÃ¨gle d'or de sÃ©curitÃ© : Ni Moov Money ni T-Money ne vous appelleront ni ne vous Ã©criront pour vous rÃ©clamer un code PIN, OTP ou mot de passe secret. En cas d'hÃ©sitation, contactez uniquement les numÃ©ros courts officiels de votre opÃ©rateur.",
+        "security_tip": "SECURITE : Ni Moov Money ni T-Money ne vous demanderont jamais votre code PIN, OTP ou mot de passe. En cas de doute, contactez le service client officiel sur les numeros courts.",
     }
 
     # Sauvegarde dans l'historique
