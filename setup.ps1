@@ -25,3 +25,4 @@ if (-not (Test-Path ".env")) {
 Write-Host ""
 Write-Host "=== Setup termine ! ===" -ForegroundColor Green
 Write-Host "Lance le serveur avec: .\run.ps1" -ForegroundColor Cyan
+

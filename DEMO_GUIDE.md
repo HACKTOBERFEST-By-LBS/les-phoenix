@@ -47,3 +47,4 @@ FELICITATIONS! Vous avez gagné 2 000 000 FCFA au grand concours Moov Money. Pou
 5. **Changer la langue en Éwé** → relancer → voir conseil traduit
 6. **Ouvrir l'Historique** → voir les 2 analyses sauvegardées
 7. **Mode Apprendre** → téléverser un cours PDF → `/plan` → `/quiz`
+

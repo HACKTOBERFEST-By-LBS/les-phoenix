@@ -9,3 +9,4 @@ Write-Host "Demarrage du serveur Fraude Scanner sur http://localhost:$port" -For
 Write-Host "Ctrl+C pour arreter." -ForegroundColor Yellow
 
 & $venv $app --port $port --host 0.0.0.0 --reload
+
