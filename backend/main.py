@@ -151,7 +151,7 @@ def db() -> sqlite3.Connection:
 # ---- Fonctions DB unifiÃ©es (Supabase ou SQLite) ----
 
 def db_get_user(pseudo: str):
-    """Retourne le user ou None."""
+    """Retourne le dictionnaire user (pseudo, salt, hash, lang) ou None si inexistant."""
     sb = get_supabase()
     if sb:
         r = sb.table("users").select("*").ilike("pseudo", pseudo).execute()
