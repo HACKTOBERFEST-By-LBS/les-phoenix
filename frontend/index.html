@@ -33,6 +33,7 @@ aside{background:var(--side);color:var(--side-ink);display:flex;flex-direction:c
 .side-user{font-weight:600;color:#fff}
 .side-logout{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;text-align:center;font-size:12px}
 .side-logout:hover{background:rgba(255,255,255,.1)}
+.wa-badge{background:rgba(37,211,102,.18);border:1px solid rgba(37,211,102,.4);border-radius:6px;padding:6px 10px;font-size:12px;color:#25d366;display:flex;align-items:center;gap:6px;margin-top:4px}
 main{overflow:auto;padding:30px clamp(16px,4vw,44px);background-image:radial-gradient(rgba(38,69,112,.13) 1.2px,transparent 1.2px);background-size:30px 30px}
 .head-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px}
 h1{margin:0;font-size:clamp(22px,3vw,30px);line-height:1.2;letter-spacing:-.01em}
@@ -73,12 +74,12 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
 .msg{max-width:78ch;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--line);white-space:pre-wrap}
 .msg.me{align-self:flex-end;background:var(--navy);color:#fff;border-color:var(--navy)}
 :root:not([data-theme="light"]) .msg.me{color:#0E1828}
+.msg.web{border-left:4px solid #4285f4;background:var(--surface)}
 .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .cmdbar{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:12px}
 .cmdbar input{flex:1}
 .cmds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .cmds .chip{font-family:ui-monospace,Menlo,Consolas,monospace}
-
 /* Historique */
 .history-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .history-item{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
@@ -89,7 +90,15 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
 .history-badge.v-arnaque{background:var(--red-bg);color:var(--red)}
 .history-preview{font-size:14px;font-weight:500;margin:4px 0}
 .history-advice{font-size:13px;color:var(--muted)}
-
+/* Dictionnaire */
+.dict-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s}
+.dict-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.dict-danger{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase}
+.dict-danger.CRITIQUE{background:#3A1C22;color:#FF8A8A}
+.dict-danger.ÉLEVÉ{background:var(--red-bg);color:var(--red)}
+.dict-danger.MOYEN{background:var(--amber-bg);color:var(--amber)}
+.dict-signal{font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--bg);padding:2px 7px;border-radius:4px;color:var(--muted)}
+.dict-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 [hidden]{display:none!important}
 @media(max-width:860px){
   .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
@@ -105,8 +114,10 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
   <aside>
     <div class="brand"><i></i>Fraude Scanner</div>
     <button class="nav" id="navScan" aria-current="true"><b>Vérifier un SMS</b><small>Mode par défaut</small></button>
-    <button class="nav" id="navLearn" aria-current="false"><b>Apprendre</b><small>S’active avec une commande /</small></button>
-    <button class="nav" id="navHistory" aria-current="false"><b>Historique</b><small>Analyses & Cours</small></button>
+    <button class="nav" id="navLearn" aria-current="false"><b>Apprendre</b><small>Cours + Recherche web</small></button>
+    <button class="nav" id="navDict" aria-current="false"><b>Dictionnaire</b><small>Arnaques connues</small></button>
+    <button class="nav" id="navHistory" aria-current="false"><b>Historique</b><small>Analyses &amp; Cours</small></button>
+    <div class="wa-badge" title="Bot WhatsApp disponible pour les tests">🟢 Bot WhatsApp actif</div>
     <div class="side-foot">
       <div class="side-user" id="userDisplay">Utilisateur</div>
       <button class="side-logout" id="logoutBtn">Se déconnecter</button>
@@ -120,7 +131,7 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
         <h1>Ce SMS est-il vrai ?</h1>
         <button class="btn ghost sm" id="resetScanBtn" type="button" title="Réinitialiser le scanner">🔄 Réinitialiser</button>
       </div>
-      <p class="sub">Colle le texte d’un SMS Mobile Money ou ajoute une capture d’écran. Tu as la réponse en quelques secondes.</p>
+      <p class="sub">Colle le texte d'un SMS Mobile Money ou ajoute une capture d'écran. Tu as la réponse en quelques secondes.</p>
       <div class="grid">
         <div class="card">
           <label for="sms">Le SMS reçu</label>
@@ -152,10 +163,10 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
             <span class="sp"></span>
             <button class="btn" id="go" type="button">Analyser</button>
           </div>
-          <p class="hint">Utilise seulement des messages d’exemple, jamais de vrais numéros. Tape <b>/apprendre</b> dans la zone du SMS pour ouvrir le mode Apprendre.</p>
+          <p class="hint">Utilise seulement des messages d'exemple, jamais de vrais numéros. Tape <b>/apprendre</b> dans la zone du SMS pour ouvrir le mode Apprendre.</p>
         </div>
         <div class="card" id="out" aria-live="polite">
-          <div class="empty">Le verdict s’affiche ici.</div>
+          <div class="empty">Le verdict s'affiche ici.</div>
         </div>
       </div>
     </section>
@@ -166,7 +177,7 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
         <h1>Apprendre avec ton cours</h1>
         <button class="btn ghost sm" id="resetLearnBtn" type="button" title="Réinitialiser la discussion">🔄 Nouveau cours / Reset</button>
       </div>
-      <p class="sub">Rien ne se passe sans commande. Tape <b>/stop</b> à tout moment pour revenir au scanner.</p>
+      <p class="sub">Rien ne se passe sans commande. Utilise <b>/recherche</b> pour chercher sur le web sans cours. Tape <b>/stop</b> pour revenir au scanner.</p>
       <div class="card chat">
         <div class="log" id="log" aria-live="polite"></div>
         <div class="cmds">
@@ -174,15 +185,38 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
           <button class="chip" data-cmd="/plan">/plan</button>
           <button class="chip" data-cmd="/quiz">/quiz</button>
           <button class="chip" data-cmd="/resume">/resume</button>
+          <button class="chip" data-cmd="/recherche fraudes Mobile Money Togo 2024">/recherche 🌐</button>
           <button class="chip" data-cmd="/stop">/stop</button>
         </div>
         <div class="cmdbar">
-          <input type="text" id="cmd" placeholder="Tape une commande qui commence par /" autocomplete="off">
-          <input type="file" id="course" accept=".pdf,image/*,.txt" hidden>
-          <button class="btn ghost" id="courseBtn" type="button">Téléverser le cours</button>
+          <input type="text" id="cmd" placeholder="Tape /recherche <sujet> ou une autre commande /" autocomplete="off">
+          <input type="file" id="course" accept=".pdf,.docx,.txt,.md,image/*" hidden>
+          <button class="btn ghost" id="courseBtn" type="button">📄 Cours (PDF/DOCX/MD)</button>
           <button class="btn" id="send" type="button">Envoyer</button>
         </div>
       </div>
+    </section>
+
+    <!-- ===== DICTIONNAIRE DES FRAUDES ===== -->
+    <section id="viewDict" hidden>
+      <div class="head-row">
+        <h1>📚 Dictionnaire des Arnaques</h1>
+        <button class="btn ghost sm" id="refreshDictBtn" type="button">🔄 Actualiser</button>
+      </div>
+      <p class="sub">Toutes les arnaques Mobile Money connues au Togo — signaux d'alerte, exemples réels et conseils de protection.</p>
+
+      <div class="dict-filter" id="dictFilter">
+        <button class="chip" data-filter="all" style="border-color:var(--navy);color:var(--navy)">Tout afficher</button>
+        <button class="chip" data-filter="CRITIQUE">🔴 Critique</button>
+        <button class="chip" data-filter="ÉLEVÉ">🟠 Élevé</button>
+        <button class="chip" data-filter="MOYEN">🟡 Moyen</button>
+      </div>
+
+      <div id="dictGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+        <div class="empty">Chargement du dictionnaire…</div>
+      </div>
+
+      <div id="dictRules" style="margin-top:28px"></div>
     </section>
 
     <!-- ===== HISTORIQUE ===== -->
@@ -205,6 +239,29 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
             <div class="empty">Aucun cours révisé pour l'instant.</div>
           </div>
         </div>
+      </div>
+
+      <!-- Section WhatsApp Bot -->
+      <div class="card" style="margin-top:18px;border-left:4px solid #25d366">
+        <h3 style="color:#25d366;margin-top:0">🤖 Bot WhatsApp — Fraude Scanner</h3>
+        <p style="color:var(--muted);font-size:14px;margin:6px 0 12px">
+          Envoyez un SMS suspect directement sur WhatsApp pour l'analyser instantanément, même sans ouvrir le site.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <div style="flex:1;min-width:200px;background:var(--bg);border-radius:8px;padding:12px;font-size:13px">
+            <strong>📱 Numéro Sandbox Twilio :</strong><br>
+            <code style="font-size:14px;color:#25d366">+1 (415) 523-8886</code>
+          </div>
+          <div style="flex:2;min-width:260px;background:var(--bg);border-radius:8px;padding:12px;font-size:13px">
+            <strong>🚀 Comment utiliser :</strong><br>
+            1. Enregistrez ce numéro sur WhatsApp<br>
+            2. Envoyez le code d'activation Twilio<br>
+            3. Collez un SMS Mobile Money suspect → réponse instantanée
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:10px 0 0">
+          ⚙️ Pour activer avec votre propre domaine : configurez <code>TWILIO_ACCOUNT_SID</code> et <code>TWILIO_AUTH_TOKEN</code> dans <code>.env</code>, puis pointez le webhook Twilio vers <code>/api/whatsapp</code>.
+        </p>
       </div>
     </section>
   </main>
@@ -240,7 +297,7 @@ $("resetScanBtn").onclick = () => {
   $("sender").value = "";
   $("shot").value = "";
   $("shotName").textContent = "";
-  $("out").innerHTML = '<div class="empty">Le verdict s’affiche ici.</div>';
+  $("out").innerHTML = '<div class="empty">Le verdict s\u0027affiche ici.</div>';
 };
 
 // Réinitialisation de la partie apprentissage
@@ -274,9 +331,9 @@ async function analyserAvecGemma(texte, image){
 }
 
 const TITLES = {
-  arnaque: ["C’est une arnaque", "N’agis pas. Ce message cherche à te prendre de l’argent."],
+  arnaque: ["C'est une arnaque", "N'agis pas. Ce message cherche à te prendre de l'argent."],
   douteux: ["Message douteux", "Certains signes sont inquiétants. Prudence."],
-  ok: ["Message probablement vrai", "Je n’ai pas trouvé de signe d’arnaque."]
+  ok: ["Message probablement vrai", "Je n'ai pas trouvé de signe d'arnaque."]
 };
 
 function render(r){
@@ -286,7 +343,7 @@ function render(r){
   const secTip = r.security_tip ? `<div class="security-banner"><strong>Conseil de sécurité :</strong>${esc(r.security_tip)}</div>` : "";
   const linkBadgeClass = r.link_analysis?.badge === "ok" ? "v-ok" : (r.link_analysis?.badge === "warning" ? "v-douteux" : (r.link_analysis?.badge === "danger" ? "v-arnaque" : "v-ok"));
   const riskColor = (r.risk_score || 0) > 60 ? "var(--red)" : ((r.risk_score || 0) > 20 ? "var(--amber)" : "var(--green)");
-  
+
   $("out").innerHTML =
     `<div class="verdict v-${r.verdict}">
        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
@@ -365,7 +422,7 @@ async function lancer(){
     const res = await analyserAvecGemma(t, file);
     if (res) render(res);
   } catch(err) {
-    $("out").innerHTML = `<div class="empty" style="color:var(--red)">Impossible d’analyser pour le moment (${esc(err.message)}). Réessaie.</div>`;
+    $("out").innerHTML = `<div class="empty" style="color:var(--red)">Impossible d'analyser pour le moment (${esc(err.message)}). Réessaie.</div>`;
   } finally {
     $("go").disabled = false;
   }
@@ -379,22 +436,24 @@ $("shot").onchange = () => $("shotName").textContent = $("shot").files[0]?.name 
 
 /* ---------- Navigation ---------- */
 function show(v){
-  $("viewScan").hidden = v !== "scan";
-  $("viewLearn").hidden = v !== "learn";
+  $("viewScan").hidden    = v !== "scan";
+  $("viewLearn").hidden   = v !== "learn";
+  $("viewDict").hidden    = v !== "dict";
   $("viewHistory").hidden = v !== "history";
   $("navScan").setAttribute("aria-current", v === "scan");
   $("navLearn").setAttribute("aria-current", v === "learn");
+  $("navDict").setAttribute("aria-current", v === "dict");
   $("navHistory").setAttribute("aria-current", v === "history");
 
   if (v === "learn" && !$("log").children.length) {
-    say("Mode Apprendre. Je n’agis que sur commande.\nTape /apprendre pour téléverser ton cours.");
+    say("Mode Apprendre actif.\nTape /apprendre pour téléverser un cours.\nOu tape /recherche <sujet> pour chercher sur le web 🌐 sans cours.");
   }
-  if (v === "history") {
-    loadHistory();
-  }
+  if (v === "history") loadHistory();
+  if (v === "dict") loadDict();
 }
-$("navScan").onclick = () => show("scan");
-$("navLearn").onclick = () => show("learn");
+$("navScan").onclick    = () => show("scan");
+$("navLearn").onclick   = () => show("learn");
+$("navDict").onclick    = () => show("dict");
 $("navHistory").onclick = () => show("history");
 
 /* ---------- Historique ---------- */
@@ -405,8 +464,7 @@ async function loadHistory() {
     const r = await fetch("/api/history");
     if (!r.ok) return;
     const d = await r.json();
-    
-    // Rendu Scans
+
     if (d.scans && d.scans.length) {
       $("scanHistoryList").innerHTML = d.scans.map(s => `
         <div class="history-item">
@@ -422,7 +480,6 @@ async function loadHistory() {
       $("scanHistoryList").innerHTML = '<div class="empty">Aucune analyse dans l\'historique.</div>';
     }
 
-    // Rendu Cours
     if (d.courses && d.courses.length) {
       $("courseHistoryList").innerHTML = d.courses.map(c => `
         <div class="history-item">
@@ -442,36 +499,136 @@ async function loadHistory() {
 }
 $("refreshHistoryBtn").onclick = loadHistory;
 
+/* ---------- Dictionnaire des fraudes ---------- */
+let dictData = null;
+
+async function loadDict() {
+  if (dictData) { renderDict(dictData, "all"); return; }
+  $("dictGrid").innerHTML = '<div class="empty">⏳ Chargement du dictionnaire…</div>';
+  try {
+    const r = await fetch("/api/fraud-dictionary");
+    if (!r.ok) throw new Error("Indisponible");
+    dictData = await r.json();
+    renderDict(dictData, "all");
+    renderDictRules(dictData);
+  } catch(e) {
+    $("dictGrid").innerHTML = '<div class="empty">Dictionnaire non disponible pour le moment.</div>';
+  }
+}
+
+function renderDict(data, filter) {
+  const cats = filter === "all" ? data.categories : data.categories.filter(c => c.niveau_danger === filter);
+  $("dictGrid").innerHTML = cats.map(cat => `
+    <div class="dict-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <span style="font-size:22px">${cat.emoji || "⚠️"}</span>
+        <span class="dict-danger ${cat.niveau_danger}">${cat.niveau_danger}</span>
+      </div>
+      <strong style="font-size:16px">${cat.nom}</strong>
+      <p style="font-size:13.5px;color:var(--muted);margin:0">${cat.description}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">
+        ${(cat.signaux || []).map(s => `<span class="dict-signal">"${s}"</span>`).join("")}
+      </div>
+      <div style="background:var(--bg);border-radius:6px;padding:8px 10px;font-size:12.5px;font-style:italic;color:var(--muted);margin-top:4px">
+        <strong>Exemple :</strong> ${cat.exemple_sms || cat.exemple || "—"}
+      </div>
+      <div style="margin-top:6px">
+        <strong style="font-size:12px;color:var(--muted)">CONSEILS :</strong>
+        <ul style="margin:4px 0;padding-left:18px;font-size:13px">
+          ${(cat.conseils || []).map(c => `<li>${c}</li>`).join("")}
+        </ul>
+      </div>
+      ${cat.operateurs_concernes ? `<div style="font-size:11.5px;color:var(--muted);margin-top:4px">📌 ${cat.operateurs_concernes.join(", ")}</div>` : ""}
+    </div>
+  `).join("") || '<div class="empty">Aucune arnaque dans cette catégorie.</div>';
+}
+
+function renderDictRules(data) {
+  if (!data.regles_or || !data.numeros_officiels) return;
+  $("dictRules").innerHTML = `
+    <div class="card" style="border-left:4px solid var(--green)">
+      <h3 style="color:var(--green);margin-top:0">🛡️ Les 4 Règles d'Or</h3>
+      <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+        ${data.regles_or.map(r => `<li style="font-weight:500">${r}</li>`).join("")}
+      </ol>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3 style="margin-top:0">📞 Numéros officiels</h3>
+      <dl style="margin:0">
+        ${Object.entries(data.numeros_officiels).map(([op,num]) =>
+          `<dt>${op}</dt><dd><code style="font-size:16px;color:var(--green)">${num}</code></dd>`
+        ).join("")}
+      </dl>
+    </div>
+  `;
+}
+
+$("refreshDictBtn").onclick = () => { dictData = null; loadDict(); };
+
+// Filtres du dictionnaire
+document.querySelectorAll("[data-filter]").forEach(b => b.onclick = () => {
+  document.querySelectorAll("[data-filter]").forEach(x => x.style.removeProperty("border-color"));
+  b.style.borderColor = "var(--navy)";
+  if (dictData) renderDict(dictData, b.dataset.filter);
+});
+
 /* ---------- Apprendre (/api/learn et /api/course) ---------- */
 let currentCourseId = null, currentCourseName = null;
 let weakTopics = [];
 let quizQuestions = [], quizIdx = -1;
 
-function say(t, me){
-  const d = document.createElement("div"); d.className = "msg" + (me ? " me" : ""); d.textContent = t;
+function say(t, me, cls){
+  const d = document.createElement("div");
+  d.className = "msg" + (me ? " me" : "") + (cls ? " " + cls : "");
+  d.textContent = t;
   $("log").append(d); $("log").scrollTop = 1e9; return d;
 }
 function needCourse(){
   if (currentCourseId) return false;
-  say("Il me faut d’abord ton cours. Tape /apprendre puis téléverse un fichier."); return true;
+  say("Il me faut d'abord ton cours. Tape /apprendre puis téléverse un fichier.\nOu utilise /recherche <sujet> pour chercher directement sur le web."); return true;
 }
 
 async function commande(c){
   c = c.trim(); if (!c) return;
   say(c, true);
-  if (!c.startsWith("/")) { say("Je n’agis que sur commande. Tape / pour voir les commandes."); return; }
+  if (!c.startsWith("/")) { say("Je n'agis que sur commande. Tape / pour voir les commandes disponibles."); return; }
   const parts = c.split(/\s+/);
   const k = parts[0].toLowerCase();
   const arg = parts.slice(1).join(" ");
 
   if (k === "/stop") { quizIdx = -1; show("scan"); return; }
+
   if (k === "/apprendre") {
-    say("Mode apprentissage activé. Téléverse ton cours (PDF, photo ou texte) avec le bouton « Téléverser le cours » ci-dessous.");
+    say("Mode apprentissage activé.\n📄 Formats acceptés : PDF, DOCX, Markdown (.md), texte (.txt) et images.\nTéléverse ton cours avec le bouton ci-dessous.");
     return;
   }
+
+  // /recherche — pas besoin de cours (Gemini Flash + Google Search)
+  if (k === "/recherche") {
+    const topic = arg || "Mobile Money Togo arnaques 2024";
+    say(`🌐 Recherche en cours sur : "${topic}"…`);
+    try {
+      const res = await fetch("/api/learn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: "/recherche", search_topic: topic })
+      });
+      if (res.status === 401) { location.replace("/login.html"); return; }
+      const data = await res.json();
+      if (data.reply) {
+        say("🌐 Résultats de recherche web (Gemini Flash) :\n\n" + data.reply, false, "web");
+      } else {
+        say("Recherche terminée mais aucun résultat.");
+      }
+    } catch(e) {
+      say("Erreur lors de la recherche web. Réessaie dans quelques instants.");
+    }
+    return;
+  }
+
   if (k === "/plan" || k === "/resume") {
     if (needCourse()) return;
-    say("⏳ Gemma prépare ta fiche / ton plan…");
+    say(`⏳ Gemma prépare ${k === "/plan" ? "ton plan de révision" : "ton résumé"}…`);
     try {
       const res = await fetch("/api/learn", {
         method: "POST",
@@ -486,6 +643,7 @@ async function commande(c){
     }
     return;
   }
+
   if (k === "/quiz") {
     if (needCourse()) return;
     say("⏳ Gemma prépare ton quiz adaptatif…");
@@ -509,7 +667,8 @@ async function commande(c){
     }
     return;
   }
-  say("Commande inconnue. Essaie /apprendre, /plan, /quiz, /resume ou /stop.");
+
+  say("Commande inconnue. Commandes disponibles : /apprendre, /plan, /quiz, /resume, /recherche <sujet>, /stop.");
 }
 
 function poser(){
@@ -547,7 +706,8 @@ $("courseBtn").onclick = () => $("course").click();
 $("course").onchange = async () => {
   const f = $("course").files[0];
   if (!f) return;
-  say(`Envoi du cours « ${f.name} » à Gemma…`);
+  const ext = f.name.split(".").pop().toLowerCase();
+  say(`📄 Envoi du cours « ${f.name} » (${ext.toUpperCase()})…`);
   const fd = new FormData();
   fd.append("file", f);
   try {
@@ -556,9 +716,9 @@ $("course").onchange = async () => {
     const d = await res.json();
     currentCourseId = d.course_id;
     currentCourseName = d.name;
-    say(`Cours bien reçu : ${d.name}. Tape /plan, /quiz ou /resume.`);
+    say(`✅ Cours bien reçu : ${d.name}\nTape /plan, /quiz ou /resume pour commencer.`);
   } catch(e) {
-    say("Erreur de téléversement du cours.");
+    say("Erreur de téléversement du cours. Vérifiez le format (PDF, DOCX, MD, TXT, image).");
   }
 };
 </script>

@@ -1,0 +1,152 @@
+{
+  "updated": "2026-10-31",
+  "version": "1.0",
+  "source": "Fraude Scanner — Les Phoenix | Hackathon Build with Gemma, Lomé Business School",
+  "categories": [
+    {
+      "id": "depot_erreur",
+      "nom": "Dépôt par erreur",
+      "niveau_danger": "ÉLEVÉ",
+      "emoji": "🔴",
+      "description": "L'arnaqueur simule un faux virement et demande un remboursement. Aucune transaction réelle n'a eu lieu.",
+      "signaux": ["dépôt par erreur", "j'ai envoyé par accident", "renvoie l'argent", "remboursement urgent", "s'il te plaît vite"],
+      "exemple_sms": "Bonjour, j'ai fait un dépôt de 25 000F par erreur sur votre numéro 9X XX XX XX. Renvoyez-moi svp, c'est urgent.",
+      "pourquoi_ca_marche": "La victime, par gentillesse, renvoie l'argent sans vérifier si elle a réellement reçu quelque chose.",
+      "conseils": [
+        "Vérifiez TOUJOURS votre solde dans l'application officielle avant tout remboursement",
+        "Un vrai opérateur peut annuler un virement — demandez à l'opérateur officiel",
+        "Ne jamais faire confiance à une capture d'écran envoyée par l'arnaqueur (facilement modifiable)",
+        "Bloquez immédiatement le numéro et signalez-le"
+      ],
+      "operateurs_concernes": ["T-Money", "Moov Money Mixx"]
+    },
+    {
+      "id": "faux_concours",
+      "nom": "Faux concours / Loterie",
+      "niveau_danger": "ÉLEVÉ",
+      "emoji": "🎰",
+      "description": "L'arnaqueur annonce un gain fictif et demande des frais de dossier, d'activation ou de livraison pour recevoir le lot.",
+      "signaux": ["félicitations", "vous avez gagné", "lot de", "tirage au sort", "frais de dossier", "caution remboursable"],
+      "exemple_sms": "FÉLICITATIONS! Votre numéro a été tiré au sort. Vous avez gagné 2 000 000 FCFA. Envoyez 15 000 FCFA de frais de dossier au 9X XX XX XX pour débloquer votre gain.",
+      "pourquoi_ca_marche": "La promesse d'un gain important fait perdre la raison à la victime qui paie de petits frais pour un grand lot.",
+      "conseils": [
+        "Aucun opérateur officiel ne vous contacte pour un concours auquel vous n'avez pas participé",
+        "Un vrai gain ne nécessite JAMAIS de payer des frais à l'avance",
+        "Ignorez et supprimez ce type de message",
+        "Signalez le numéro à votre opérateur"
+      ],
+      "operateurs_concernes": ["T-Money", "Moov Money Mixx", "Tous opérateurs"]
+    },
+    {
+      "id": "phishing_pin",
+      "nom": "Hameçonnage PIN / OTP",
+      "niveau_danger": "CRITIQUE",
+      "emoji": "☠️",
+      "description": "L'arnaqueur se fait passer pour un opérateur ou un agent et demande votre code PIN, OTP ou mot de passe sous divers prétextes.",
+      "signaux": ["votre code PIN", "code OTP", "code secret", "mot de passe", "code de confirmation", "validez avec votre code"],
+      "exemple_sms": "T-Money: Votre compte sera bloqué dans 24h. Confirmez votre identité en envoyant votre code PIN au 8X XX XX XX. Service Client.",
+      "pourquoi_ca_marche": "La menace de blocage de compte crée une panique qui pousse la victime à agir vite sans réfléchir.",
+      "conseils": [
+        "NI T-Money NI Moov Money ne vous demanderont JAMAIS votre code PIN ou OTP",
+        "Aucun employé officiel n'a le droit de vous demander votre code secret",
+        "Raccrochez immédiatement si on vous pose cette question par téléphone",
+        "Changez votre PIN immédiatement si vous l'avez divulgué (contactez le 888 ou 101)"
+      ],
+      "operateurs_concernes": ["T-Money (888)", "Moov Money Mixx (101)"]
+    },
+    {
+      "id": "faux_agent",
+      "nom": "Faux agent de réactivation",
+      "niveau_danger": "ÉLEVÉ",
+      "emoji": "🎭",
+      "description": "Une personne se présente comme agent officiel et propose de 'réactiver', 'débloquer' ou 'mettre à jour' votre compte contre paiement.",
+      "signaux": ["réactivation compte", "mise à jour requise", "frais de réactivation", "compte suspendu", "envoyez pour débloquer"],
+      "exemple_sms": "Agent Moov Money: Votre compte nécessite une mise à jour. Envoyez 5 000F au 9X XX XX XX pour réactiver votre portefeuille. Ref: ACT2024.",
+      "pourquoi_ca_marche": "La crainte de perdre l'accès à son argent pousse la victime à payer sans vérifier.",
+      "conseils": [
+        "Contactez directement votre opérateur via les numéros courts officiels : 101 (Moov) / 888 (T-Money)",
+        "Rendez-vous en agence officielle si nécessaire — jamais de paiement par SMS pour une réactivation",
+        "Vérifiez si votre compte fonctionne toujours via l'application officielle"
+      ],
+      "operateurs_concernes": ["Moov Money Mixx", "T-Money"]
+    },
+    {
+      "id": "tontine_pyramide",
+      "nom": "Tontine numérique / Système pyramidal",
+      "niveau_danger": "ÉLEVÉ",
+      "emoji": "🏗️",
+      "description": "Un réseau demande des versements réguliers promettant des retours impossibles. Le réseau s'effondre et les derniers entrants perdent tout.",
+      "signaux": ["tontine", "investissement garanti", "rendement 200%", "recrutez 3 personnes", "mise de départ", "retour X10"],
+      "exemple_sms": "Rejoignez notre tontine digitale! Investissez 10 000F et récupérez 100 000F en 7 jours. Ajoutez 3 amis et votre gain double. Whatsapp: +22890000000",
+      "pourquoi_ca_marche": "Les premiers entrants reçoivent vraiment de l'argent (financé par les suivants), ce qui crédibilise l'arnaque.",
+      "conseils": [
+        "Aucun investissement légitime ne garantit 200% de rendement en quelques jours",
+        "Si vous devez recruter des gens pour gagner, c'est un système pyramidal",
+        "Signalez ce type d'offre à la police économique du Togo"
+      ],
+      "operateurs_concernes": ["Tous canaux (WhatsApp, SMS, réseaux sociaux)"]
+    },
+    {
+      "id": "faux_ussd",
+      "nom": "Faux code USSD piège",
+      "niveau_danger": "CRITIQUE",
+      "emoji": "📞",
+      "description": "L'arnaqueur envoie un faux code USSD à composer. En réalité, ce code peut transférer de l'argent ou confirmer une opération à votre insu.",
+      "signaux": ["composez *145#", "tapez *155#", "entrez ce code", "confirmez en composant", "validation USSD"],
+      "exemple_sms": "Validation requise. Composez *145*9XXXXXXXX*25000# pour confirmer la réception de votre remboursement de 25 000F.",
+      "pourquoi_ca_marche": "La victime pense confirmer une réception mais elle initie en réalité un transfert d'argent sortant.",
+      "conseils": [
+        "Ne jamais composer un code USSD envoyé par quelqu'un d'autre",
+        "Les codes USSD officiels sont publiés sur le site de votre opérateur",
+        "Un code USSD qui inclut un numéro de téléphone et un montant est probablement un transfert piège"
+      ],
+      "operateurs_concernes": ["T-Money", "Moov Money Mixx"]
+    },
+    {
+      "id": "lien_phishing",
+      "nom": "Lien d'hameçonnage web",
+      "niveau_danger": "ÉLEVÉ",
+      "emoji": "🔗",
+      "description": "Un lien raccourcisseur ou suspect est envoyé pour rediriger vers un faux site imitant votre banque ou opérateur Mobile Money.",
+      "signaux": ["bit.ly", "tinyurl", "cliquez ici", "http://", "vérifiez votre compte sur", "formulaire en ligne"],
+      "exemple_sms": "Votre compte Moov Money a été compromis. Vérifiez immédiatement vos informations sur bit.ly/moov-tg-secure avant 18h.",
+      "pourquoi_ca_marche": "Le faux site collecte vos identifiants. Les liens raccourcisseurs masquent la destination réelle.",
+      "conseils": [
+        "Le seul lien officiel Moov Mixx est: https://onelink.to/czwadf",
+        "Ne cliquez jamais sur un lien dans un SMS non sollicité",
+        "Vérifiez l'adresse complète avant de cliquer — un caractère différent peut suffire (moov-africa.tg vs moov-africa-togo.com)",
+        "En cas de doute, accédez à votre compte directement depuis l'application officielle"
+      ],
+      "operateurs_concernes": ["Tous opérateurs"]
+    },
+    {
+      "id": "urgence_pression",
+      "nom": "Pression temporelle / Urgence fabriquée",
+      "niveau_danger": "MOYEN",
+      "emoji": "⏰",
+      "description": "L'arnaqueur crée une fausse urgence pour empêcher la victime de réfléchir et de vérifier les informations.",
+      "signaux": ["avant ce soir", "dans les 2 heures", "immédiatement", "dernier délai", "compte bloqué à minuit"],
+      "exemple_sms": "URGENT: Votre compte T-Money sera définitivement bloqué ce soir à 23h si vous ne confirmez pas votre identité maintenant.",
+      "pourquoi_ca_marche": "La pression temporelle court-circuite la réflexion critique et pousse à agir impulsivem.",
+      "conseils": [
+        "Prenez le temps de réfléchir — une vraie urgence se gère via les canaux officiels",
+        "Appelez directement le 888 (T-Money) ou 101 (Moov) pour vérifier",
+        "Les vraies alertes de sécurité n'exigent jamais une action par SMS"
+      ],
+      "operateurs_concernes": ["Tous opérateurs"]
+    }
+  ],
+  "numeros_officiels": {
+    "Moov Money Mixx": "101",
+    "T-Money (Togocom/Yas)": "888",
+    "Police Togo": "117",
+    "ARSE (régulateur)": "+228 22 61 90 90"
+  },
+  "regles_or": [
+    "Ton PIN est SECRET — ne le donne JAMAIS, même à un 'agent' officiel",
+    "Un opérateur officiel ne vous demandera JAMAIS d'envoyer de l'argent pour débloquer votre compte",
+    "Vérifiez TOUJOURS votre solde dans l'application officielle, pas dans un SMS",
+    "En cas de doute, appelez directement le service client officiel avant toute action"
+  ]
+}
+
