@@ -340,7 +340,9 @@ def logout(request: Request, response: Response):
 def me(user: dict = Depends(current_user)):
     return {"pseudo": user["pseudo"], "langue": user["lang"]}
 
-# ---- Route Scanner ----
+# ═══════════════════════════════════════════════
+# Route Scanner : /api/analyse
+# ═══════════════════════════════════════════════
 
 @app.post("/api/analyse")
 async def analyse(
@@ -384,13 +386,17 @@ async def analyse(
 
     return res
 
-# ---- Route Historique ----
+# ═══════════════════════════════════════════════
+# Route Historique : /api/history
+# ═══════════════════════════════════════════════
 
 @app.get("/api/history")
 def get_history(user: dict = Depends(current_user)):
     return db_get_history(user["pseudo"])
 
-# ---- Route Cours ----
+# ═══════════════════════════════════════════════
+# Routes Cours : /api/course /api/learn
+# ═══════════════════════════════════════════════
 
 @app.post("/api/course")
 async def upload_course(file: UploadFile = File(...), user: dict = Depends(current_user)):
