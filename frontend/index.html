@@ -20,7 +20,7 @@
 html,body{height:100%;margin:0}
 body{font:15px/1.5 "Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
 button,input,textarea,select{font:inherit;color:inherit}
-.app{display:grid;grid-template-columns:230px 1fr;height:100%}
+.app{display:grid;grid-template-columns:240px 1fr;height:100%}
 aside{background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;padding:22px 14px;gap:6px}
 .brand{display:flex;align-items:center;gap:10px;padding:0 8px 22px;font-weight:700;font-size:17px;color:#fff}
 .brand i{width:12px;height:12px;border-radius:50%;background:#E24B4B;box-shadow:0 0 0 5px rgba(226,75,75,.22)}
@@ -34,7 +34,8 @@ aside{background:var(--side);color:var(--side-ink);display:flex;flex-direction:c
 .side-logout{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;text-align:center;font-size:12px}
 .side-logout:hover{background:rgba(255,255,255,.1)}
 main{overflow:auto;padding:30px clamp(16px,4vw,44px);background-image:radial-gradient(rgba(38,69,112,.13) 1.2px,transparent 1.2px);background-size:30px 30px}
-h1{margin:0 0 4px;font-size:clamp(22px,3vw,30px);line-height:1.2;letter-spacing:-.01em}
+.head-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px}
+h1{margin:0;font-size:clamp(22px,3vw,30px);line-height:1.2;letter-spacing:-.01em}
 .sub{margin:0 0 22px;color:var(--muted);max-width:60ch}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
@@ -47,6 +48,7 @@ textarea{min-height:150px;resize:vertical}
 .btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:11px 20px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 :root:not([data-theme="light"]) .btn{color:#0E1828}
 .btn.ghost{background:none;color:var(--navy);border:1px solid var(--line)}
+.btn.sm{padding:7px 14px;font-size:13.5px}
 .btn:disabled{opacity:.5;cursor:wait}
 .sp{flex:1}
 .hint{font-size:13px;color:var(--muted);margin:10px 0 0}
@@ -64,6 +66,8 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
 .advice{margin-top:14px;padding:12px 14px;background:var(--bg);border-radius:8px;font-weight:500}
 .advice-local{margin-top:10px;padding:10px 12px;border:1.5px dashed var(--line);border-radius:8px;font-size:14px}
 .advice-local small{display:block;color:var(--muted);margin-bottom:2px}
+.security-banner{margin-top:12px;padding:12px 14px;border-left:4px solid var(--green);background:var(--green-bg);border-radius:0 8px 8px 0;font-size:13.5px}
+.security-banner strong{display:block;margin-bottom:3px;color:var(--green)}
 .chat{display:flex;flex-direction:column;height:min(620px,calc(100vh - 150px))}
 .log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px 12px}
 .msg{max-width:78ch;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--line);white-space:pre-wrap}
@@ -74,6 +78,18 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
 .cmdbar input{flex:1}
 .cmds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .cmds .chip{font-family:ui-monospace,Menlo,Consolas,monospace}
+
+/* Historique */
+.history-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.history-item{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.history-header{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.history-badge{padding:3px 8px;border-radius:6px;font-weight:600;font-size:12px;text-transform:uppercase}
+.history-badge.v-ok{background:var(--green-bg);color:var(--green)}
+.history-badge.v-douteux{background:var(--amber-bg);color:var(--amber)}
+.history-badge.v-arnaque{background:var(--red-bg);color:var(--red)}
+.history-preview{font-size:14px;font-weight:500;margin:4px 0}
+.history-advice{font-size:13px;color:var(--muted)}
+
 [hidden]{display:none!important}
 @media(max-width:860px){
   .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
@@ -90,6 +106,7 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
     <div class="brand"><i></i>Fraude Scanner</div>
     <button class="nav" id="navScan" aria-current="true"><b>Vérifier un SMS</b><small>Mode par défaut</small></button>
     <button class="nav" id="navLearn" aria-current="false"><b>Apprendre</b><small>S’active avec une commande /</small></button>
+    <button class="nav" id="navHistory" aria-current="false"><b>Historique</b><small>Analyses & Cours</small></button>
     <div class="side-foot">
       <div class="side-user" id="userDisplay">Utilisateur</div>
       <button class="side-logout" id="logoutBtn">Se déconnecter</button>
@@ -99,7 +116,10 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
   <main>
     <!-- ===== SCANNER ===== -->
     <section id="viewScan">
-      <h1>Ce SMS est-il vrai ?</h1>
+      <div class="head-row">
+        <h1>Ce SMS est-il vrai ?</h1>
+        <button class="btn ghost sm" id="resetScanBtn" type="button" title="Réinitialiser le scanner">🔄 Réinitialiser</button>
+      </div>
       <p class="sub">Colle le texte d’un SMS Mobile Money ou ajoute une capture d’écran. Tu as la réponse en quelques secondes.</p>
       <div class="grid">
         <div class="card">
@@ -119,9 +139,10 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
           <div style="margin-top:14px">
             <label for="langSelect">Langue de l'alerte</label>
             <select id="langSelect">
-              <option value="fr">Français</option>
-              <option value="ee">Français + Éwé (test)</option>
-              <option value="kbp">Français + Kabiyè (test)</option>
+              <option value="fr">Français (par défaut)</option>
+              <option value="ee">Français + Éwé (Togo)</option>
+              <option value="kbp">Français + Kabiyè (Togo)</option>
+              <option value="en">Français + English</option>
             </select>
           </div>
           <div class="row">
@@ -141,7 +162,10 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
 
     <!-- ===== APPRENDRE ===== -->
     <section id="viewLearn" hidden>
-      <h1>Apprendre avec ton cours</h1>
+      <div class="head-row">
+        <h1>Apprendre avec ton cours</h1>
+        <button class="btn ghost sm" id="resetLearnBtn" type="button" title="Réinitialiser la discussion">🔄 Nouveau cours / Reset</button>
+      </div>
       <p class="sub">Rien ne se passe sans commande. Tape <b>/stop</b> à tout moment pour revenir au scanner.</p>
       <div class="card chat">
         <div class="log" id="log" aria-live="polite"></div>
@@ -160,13 +184,36 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
         </div>
       </div>
     </section>
+
+    <!-- ===== HISTORIQUE ===== -->
+    <section id="viewHistory" hidden>
+      <div class="head-row">
+        <h1>Historique de tes activités</h1>
+        <button class="btn ghost sm" id="refreshHistoryBtn" type="button">🔄 Actualiser</button>
+      </div>
+      <p class="sub">Retrouve tes dernières vérifications de SMS et tes sessions d'apprentissage.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Derniers SMS analysés</h3>
+          <div id="scanHistoryList" class="history-list">
+            <div class="empty">Aucun historique d'analyse disponible.</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Derniers cours révisés</h3>
+          <div id="courseHistoryList" class="history-list">
+            <div class="empty">Aucun cours révisé pour l'instant.</div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
 
-// Protection de l'interface & récupération session
+// Protection de l'interface & session
 (async () => {
   try {
     const r = await fetch("/api/me");
@@ -185,6 +232,26 @@ const $ = id => document.getElementById(id);
 $("logoutBtn").onclick = async () => {
   await fetch("/api/logout", { method: "POST" });
   location.href = "/login.html";
+};
+
+// Réinitialisation du scanner
+$("resetScanBtn").onclick = () => {
+  $("sms").value = "";
+  $("sender").value = "";
+  $("shot").value = "";
+  $("shotName").textContent = "";
+  $("out").innerHTML = '<div class="empty">Le verdict s’affiche ici.</div>';
+};
+
+// Réinitialisation de la partie apprentissage
+$("resetLearnBtn").onclick = () => {
+  $("log").innerHTML = "";
+  currentCourseId = null;
+  currentCourseName = null;
+  weakTopics = [];
+  quizQuestions = [];
+  quizIdx = -1;
+  say("Discussion et cours réinitialisés. Tape /apprendre puis téléverse ton cours.");
 };
 
 const EX = {
@@ -215,7 +282,9 @@ const TITLES = {
 function render(r){
   const [h, p] = TITLES[r.verdict] || TITLES.douteux;
   const esc = s => String(s || "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-  const localAdv = r.advice_local ? `<div class="advice-local"><small>Traduction locale (expérimentale) :</small>${esc(r.advice_local)}</div>` : "";
+  const localAdv = r.advice_local ? `<div class="advice-local"><small>Traduction locale :</small>${esc(r.advice_local)}</div>` : "";
+  const secTip = r.security_tip ? `<div class="security-banner"><strong>Conseil de sécurité réflexe :</strong>${esc(r.security_tip)}</div>` : "";
+  
   $("out").innerHTML =
     `<div class="verdict v-${r.verdict}"><h2>${h}</h2><p>${p}</p></div>
      <dl>
@@ -226,6 +295,7 @@ function render(r){
      ${r.reasons && r.reasons.length ? `<h3>Pourquoi</h3><ul class="why">${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
      <div class="advice"><strong>Que faire : </strong>${esc(r.advice)}</div>
      ${localAdv}
+     ${secTip}
      <div style="margin-top:14px; display:flex; gap:8px;">
        <button class="btn ghost" type="button" id="copyBtn">📋 Copier l'alerte</button>
        <button class="btn ghost" type="button" id="speakBtn">🔊 Écouter</button>
@@ -273,14 +343,70 @@ $("shot").onchange = () => $("shotName").textContent = $("shot").files[0]?.name 
 
 /* ---------- Navigation ---------- */
 function show(v){
-  $("viewScan").hidden = v !== "scan"; $("viewLearn").hidden = v !== "learn";
-  $("navScan").setAttribute("aria-current", v === "scan"); $("navLearn").setAttribute("aria-current", v === "learn");
-  if (v === "learn" && !$("log").children.length) say("Mode Apprendre. Je n’agis que sur commande.\nTape /apprendre pour téléverser ton cours.");
+  $("viewScan").hidden = v !== "scan";
+  $("viewLearn").hidden = v !== "learn";
+  $("viewHistory").hidden = v !== "history";
+  $("navScan").setAttribute("aria-current", v === "scan");
+  $("navLearn").setAttribute("aria-current", v === "learn");
+  $("navHistory").setAttribute("aria-current", v === "history");
+
+  if (v === "learn" && !$("log").children.length) {
+    say("Mode Apprendre. Je n’agis que sur commande.\nTape /apprendre pour téléverser ton cours.");
+  }
+  if (v === "history") {
+    loadHistory();
+  }
 }
 $("navScan").onclick = () => show("scan");
 $("navLearn").onclick = () => show("learn");
+$("navHistory").onclick = () => show("history");
 
-/* ---------- Apprendre (intégré avec /api/learn et /api/course) ---------- */
+/* ---------- Historique ---------- */
+async function loadHistory() {
+  $("scanHistoryList").innerHTML = '<div class="empty">Chargement de l\'historique…</div>';
+  $("courseHistoryList").innerHTML = '<div class="empty">Chargement de l\'historique…</div>';
+  try {
+    const r = await fetch("/api/history");
+    if (!r.ok) return;
+    const d = await r.json();
+    
+    // Rendu Scans
+    if (d.scans && d.scans.length) {
+      $("scanHistoryList").innerHTML = d.scans.map(s => `
+        <div class="history-item">
+          <div class="history-header">
+            <span>${new Date(s.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            <span class="history-badge v-${s.verdict}">${s.verdict}</span>
+          </div>
+          <div class="history-preview">"${s.sms_preview}"</div>
+          <div class="history-advice">Montant: ${s.amount} · Conseil: ${s.advice}</div>
+        </div>
+      `).join("");
+    } else {
+      $("scanHistoryList").innerHTML = '<div class="empty">Aucune analyse dans l\'historique.</div>';
+    }
+
+    // Rendu Cours
+    if (d.courses && d.courses.length) {
+      $("courseHistoryList").innerHTML = d.courses.map(c => `
+        <div class="history-item">
+          <div class="history-header">
+            <span>${new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            <span class="chip" style="padding:2px 8px;font-size:11px">${c.last_command}</span>
+          </div>
+          <div class="history-preview">📘 ${c.course_name}</div>
+        </div>
+      `).join("");
+    } else {
+      $("courseHistoryList").innerHTML = '<div class="empty">Aucun cours révisé pour l\'instant.</div>';
+    }
+  } catch(e) {
+    $("scanHistoryList").innerHTML = '<div class="empty">Erreur de chargement.</div>';
+  }
+}
+$("refreshHistoryBtn").onclick = loadHistory;
+
+/* ---------- Apprendre (/api/learn et /api/course) ---------- */
 let currentCourseId = null, currentCourseName = null;
 let weakTopics = [];
 let quizQuestions = [], quizIdx = -1;
