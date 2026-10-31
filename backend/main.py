@@ -358,7 +358,7 @@ async def analyse(
     try:
         data = parse_json(gen(parts, SCAN_SYSTEM, 0.1))
     except Exception as e:
-        raise HTTPException(502, f"Analyse impossible : {e}")
+        raise HTTPException(502, f"Analyse Gemma impossible pour le moment. Réessaie dans quelques secondes.")
 
     verdict = data.get("verdict") if data.get("verdict") in ("ok", "douteux", "arnaque") else "douteux"
     if re.search(r"\bpin\b|code secret|mot de passe", text, re.I) and verdict == "ok":
