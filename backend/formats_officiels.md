@@ -21,3 +21,4 @@ Ces modèles authentiques anonymisés servent de référence absolue de syntaxe 
 1. Annonce une opération déjà effectuée (passé).
 2. Contient le montant, la date/heure, le nouveau solde et une référence/ID unique.
 3. Ne demande JAMAIS de renvoyer de l'argent, de taper son code secret/PIN, ni de payer des frais pour débloquer un gain.
+
