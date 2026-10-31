@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vérif'SMS – Ce SMS Mobile Money est-il vrai ?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">🛡️ Vérif'SMS</div>
+      <div class="tagline">Protège-toi des arnaques Mobile Money</div>
+    </div>
+    <div class="header-right">
+      <div class="mode-badge" id="mode" role="status" aria-live="polite">Scanner</div>
+      <select id="langue" class="lang-select" aria-label="Langue">
+        <option value="fr">🇫🇷 FR</option>
+        <option value="ewe">🇹🇬 Éwé</option>
+        <option value="kabiye">🇹🇬 Kabiyè</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- Écran d'accueil -->
+    <section id="welcome" class="welcome">
+      <div class="hero">
+        <div class="hero-icon">🔍</div>
+        <h1>Un SMS d'argent te fait douter ?</h1>
+        <p class="hero-sub">Colle le texte ou envoie une capture.<br>Gemma te dit en secondes si c'est vrai ou faux.</p>
+      </div>
+
+      <!-- Boutons d'action principaux -->
+      <div class="action-grid">
+        <button type="button" class="action-card" id="btnScan">
+          <span class="action-icon">📱</span>
+          <span class="action-title">Scanner un SMS</span>
+          <span class="action-desc">Colle un SMS suspect</span>
+        </button>
+        <button type="button" class="action-card" id="btnPhoto">
+          <span class="action-icon">📸</span>
+          <span class="action-title">Envoyer une capture</span>
+          <span class="action-desc">Photo ou capture d'écran</span>
+        </button>
+        <button type="button" class="action-card" id="btnLearn">
+          <span class="action-icon">📚</span>
+          <span class="action-title">Réviser un cours</span>
+          <span class="action-desc">Quiz, plan, fiches</span>
+        </button>
+        <button type="button" class="action-card" id="btnExamples">
+          <span class="action-icon">💡</span>
+          <span class="action-title">Exemples</span>
+          <span class="action-desc">Tester avec des SMS</span>
+        </button>
+      </div>
+
+      <!-- Exemples (cachés par défaut) -->
+      <div class="examples-panel" id="examplesPanel" hidden>
+        <h3>Essaie avec un exemple :</h3>
+        <div class="samples" id="samples"></div>
+      </div>
+
+      <p class="privacy">🔒 Aucune donnée n'est enregistrée. Utilise des messages d'exemple, sans vrai numéro.</p>
+    </section>
+
+    <!-- Fil de discussion -->
+    <div id="thread" class="thread" aria-live="polite"></div>
+
+  </main>
+
+  <!-- ===== COMPOSER ===== -->
+  <footer class="composer" id="composerBar">
+    <div class="chips" id="chips"></div>
+    <div id="preview" class="preview" hidden></div>
+    <form id="form" class="input-row" autocomplete="off">
+      <label class="attach-btn" title="Joindre une capture, une photo ou un PDF">
+        <input type="file" id="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12.5 12.6 21a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.5 8.5a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </label>
+      <textarea id="msg" rows="1" placeholder="Colle le SMS ici…" aria-label="Message"></textarea>
+      <button type="submit" id="send" class="send-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 20v-6l18-2-18-2V4l22 8z" fill="currentColor"/></svg>
+      </button>
+    </form>
+    <div class="composer-actions">
+      <button type="button" class="quick-btn" id="qHome" title="Accueil">🏠</button>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

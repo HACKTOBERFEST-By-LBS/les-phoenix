@@ -1,0 +1,84 @@
+{
+  "_note": "Référentiel basé sur de VRAIS SMS Moov Money (Mixx) anonymisés. Les numéros, agents et montants ont été modifiés. Les formats et la syntaxe sont fidèles aux originaux.",
+  "principes": [
+    "Un vrai SMS de notification Mobile Money est automatique : il annonce une opération déjà faite (reçu, envoyé, retrait, paiement, dépôt, recharge) avec montant, date/heure, nouveau solde et référence de transaction. Il ne demande rien à la personne.",
+    "Un opérateur ne demande JAMAIS par SMS ou par appel de renvoyer de l'argent, de donner un code secret / PIN / code de confirmation, ou de payer des frais pour recevoir un gain.",
+    "Une personne qui dit avoir fait un dépôt 'par erreur' et demande de lui renvoyer l'argent est une arnaque classique : le SMS de dépôt peut être un faux, ou un vrai dépôt lié à une fraude. Il faut vérifier le solde par le canal officiel avant toute action.",
+    "Gains de concours que la personne n'a pas joués, loteries, 'tontines' promettant de multiplier l'argent en peu de temps, frais de dossier à payer : arnaques.",
+    "Pression et urgence ('dans 24h', 'vite', 'sinon compte bloqué'), liens raccourcis ou site qui imite l'opérateur, expéditeur qui est un numéro de téléphone ordinaire : signaux d'alerte.",
+    "Un SMS peut imiter parfaitement le format officiel. Si le format est correct MAIS que le message demande une action (renvoyer, appeler, donner un code), c'est un signal fort d'arnaque.",
+    "Les vrais SMS Moov Money utilisent le mot 'Mixx' pour désigner le solde ('solde Mixx') et incluent toujours une référence (Ref:) à 11 chiffres.",
+    "Les vrais SMS Moov Money de retrait mentionnent toujours 'Frais remboursés: X FCFA' en plus des frais normaux.",
+    "Les vrais SMS de dépôt mentionnent l'identifiant de l'agent sous la forme 'XXXXX(NOM DE L'AGENT)' entre parenthèses.",
+    "Un lien officiel Moov Money vers l'application est 'https://onelink.to/czwadf'. Tout autre lien est suspect."
+  ],
+  "officiels": [
+    {
+      "operateur": "Moov Money (Mixx)",
+      "type": "depot agent",
+      "texte": "Dépôt de 5 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 01-10-26 13:21. Frais: 0 FCFA. Nouveau solde Mixx : 7 500 FCFA . Ref: 19801100001."
+    },
+    {
+      "operateur": "Moov Money (Mixx)",
+      "type": "retrait agent",
+      "texte": "Vous avez retire 10 000 FCFA auprès de l'agent 90002(BOUTIQUE ADAMA MARCHE), le 24-10-26 10:46. Frais: 200 FCFA. Frais remboursés: 0 FCFA. Nouveau solde: 5 300 FCFA. Ref: 20222400002."
+    },
+    {
+      "operateur": "Moov Money (Mixx)",
+      "type": "recharge forfait",
+      "texte": "Vous avez recharge le forfait NET599+ (599 FCFA FCFA) pour votre numéro, le 21-10-26 21:55. Frais: 0 FCFA FCFA. Nouveau solde: 101 FCFA FCFA. Ref: 20180200003 Découvrez la nvelle appli Mixx: https://onelink.to/czwadf"
+    },
+    {
+      "operateur": "Moov Money (Mixx)",
+      "type": "reception internationale",
+      "texte": "Vous avez reçu 15 000 FCFA du 90 00 00 04 (FRANCE) le 2026-10-31. Votre nouveau solde Mixx : 22 500 FCFA. Ref: 20342400004"
+    },
+    {
+      "operateur": "T-Money (modèle fictif à valider)",
+      "type": "argent recu",
+      "texte": "Vous avez recu 5 000 FCFA de KOMLA A. (90 00 00 05) le 31/10/2026 a 10:42. Nouveau solde : 17 500 FCFA. ID de transaction : 2610310042871."
+    },
+    {
+      "operateur": "T-Money (modèle fictif à valider)",
+      "type": "paiement marchand",
+      "texte": "Paiement de 2 500 FCFA a BOUTIQUE AWA effectue le 29/10/2026 a 09:05. Nouveau solde : 4 850 FCFA. ID : 2610290905114."
+    }
+  ],
+  "arnaques": [
+    {
+      "famille": "depot par erreur",
+      "texte": "Bonjour, j'ai fait un depot de 25 000F sur votre compte par erreur. Merci de me renvoyer l'argent au 90 00 00 04 c'est urgent.",
+      "signaux": ["demande de renvoyer l'argent", "urgence", "numero personnel"]
+    },
+    {
+      "famille": "faux concours",
+      "texte": "FELICITATIONS! Vous avez gagne 2 000 000 FCFA au grand concours Moov Money. Envoyez 15 000 FCFA de frais de dossier au 96 00 00 05.",
+      "signaux": ["gain non joue", "frais a payer pour recevoir", "paiement vers un numero personnel"]
+    },
+    {
+      "famille": "faux blocage de compte",
+      "texte": "Cher client, votre compte Mixx sera BLOQUE dans 24h. Confirmez votre code secret sur http://moov-mixx-verif.example/login.",
+      "signaux": ["menace de blocage", "demande du code secret", "lien qui imite l'operateur"]
+    },
+    {
+      "famille": "fausse tontine",
+      "texte": "Tontine Solidarite 2026 : cotisez 10 000 FCFA aujourd'hui, vous recevrez 100 000 FCFA demain. Place limitee. Envoyez au 97 00 00 06.",
+      "signaux": ["gain irrealiste", "place limitee", "paiement vers un numero personnel"]
+    },
+    {
+      "famille": "faux format officiel + demande de renvoi",
+      "texte": "Dépôt de 50 000 FCFA chez l'agent 90001(PSDTT ETS KOFFI), le 31-10-26 08:12. Frais: 0 FCFA. Nouveau solde Mixx : 52 300 FCFA . Ref: 123. Erreur de depot, veuillez renvoyer 50 000 FCFA au 90 00 00 08.",
+      "signaux": ["imite le format officiel Moov", "reference trop courte (3 chiffres au lieu de 11)", "demande de renvoyer"]
+    },
+    {
+      "famille": "faux depot Mixx + renvoi",
+      "texte": "Vous avez reçu 30 000 FCFA du 90 00 00 09 (TOGO) le 2026-10-31. Votre nouveau solde Mixx : 30 500 FCFA. Ref: 20342400099. SVP c'est une erreur, renvoie moi vite au 90 00 00 09.",
+      "signaux": ["format officiel imité", "demande de renvoyer ajoutée à la fin", "tutoiement inhabituel dans un SMS officiel"]
+    },
+    {
+      "famille": "faux agent Moov demande PIN",
+      "texte": "Service Moov Money : une erreur sur votre retrait de 99 000 FCFA chez l'agent 39963. Envoyez votre code PIN au 8555 pour correction.",
+      "signaux": ["demande du code PIN", "reference a un vrai retrait pour credibiliser", "numero court inhabituel"]
+    }
+  ]
+}

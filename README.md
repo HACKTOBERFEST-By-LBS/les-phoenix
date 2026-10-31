@@ -66,8 +66,29 @@ Départage : critère 2 (innovation), puis critère 4 (démo).
 
 ## Démarrer
 
+### 1. Configuration & Prérequis
+- Python 3.11+
+- Clé d'API Google AI Studio (Gemma) : https://aistudio.google.com/apikey
+
 ```bash
-cp .env.example .env   # puis renseigner GEMINI_API_KEY
+# Copier le fichier d'environnement et renseigner votre GEMINI_API_KEY
+cp .env.example .env
+
+# Créer l'environnement virtuel et installer les dépendances
+python -m venv .venv
+source .venv/bin/activate       # Sur Windows : .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-Complétez ensuite cette section avec le canal choisi (Web ou WhatsApp), les commandes pour lancer le projet et le lien de la démo.
+### 2. Lancement du serveur Web (Canal Web)
+```bash
+uvicorn backend.main:app --reload --port 8000
+```
+L'application web est accessible sur : `http://localhost:8000`
+
+### 3. Évaluation de la détection (Test Benchmark)
+Le benchmark teste l'IA Gemma contre 15 cas de SMS représentatifs (légitimes, arnaques sophistiquées, cas pièges) :
+```bash
+python -m tests.eval
+```
+Score actuel : **15/15 (100% de détections correctes, 0 faux positif)**.
