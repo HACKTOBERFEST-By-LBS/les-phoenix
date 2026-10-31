@@ -1,11 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fraude Scanner - Les Phoenix</title>
-<meta name="description" content="Analyse tes SMS Mobile Money en quelques secondes. Detecte les arnaques T-Money et Moov Money au Togo.">
-<meta name="theme-color" content="#1D3557">
+<title>Fraude Scanner</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
 <style>
 :root{
@@ -179,7 +177,7 @@ ul.why{margin:0;padding-left:20px}ul.why li{margin:3px 0}
           <button class="chip" data-cmd="/stop">/stop</button>
         </div>
         <div class="cmdbar">
-          <input type="text" id="cmd" placeholder="Ex: /plan, /quiz, /resume, /stop" autocomplete="off">
+          <input type="text" id="cmd" placeholder="Tape une commande qui commence par /" autocomplete="off">
           <input type="file" id="course" accept=".pdf,image/*,.txt" hidden>
           <button class="btn ghost" id="courseBtn" type="button">Téléverser le cours</button>
           <button class="btn" id="send" type="button">Envoyer</button>
@@ -293,7 +291,10 @@ function render(r){
        <dt>Montant</dt><dd>${esc(r.amount)}</dd>
        <dt>Expéditeur</dt><dd>${esc(r.sender)}</dd>
        <dt>Format</dt><dd>${esc(r.syntax)}</dd>
+       <dt>Référence</dt><dd>${esc(r.ref_check || "Non vérifiée")}</dd>
+       ${r.mode && r.mode !== "texte" ? `<dt>Mode</dt><dd>${esc(r.mode)}</dd>` : ""}
      </dl>
+     ${r.extracted_text ? `<div style="margin:10px 0;padding:8px 12px;background:var(--bg);border:1px dashed var(--line);border-radius:6px;font-size:13px;"><strong>Texte lu dans l'image :</strong> <em>${esc(r.extracted_text)}</em></div>` : ""}
      ${r.reasons && r.reasons.length ? `<h3>Pourquoi</h3><ul class="why">${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
      <div class="advice"><strong>Que faire : </strong>${esc(r.advice)}</div>
      ${localAdv}
