@@ -117,7 +117,7 @@ def get_supabase():
             print(f"[DB] Supabase import/connect error: {e} â†’ fallback SQLite")
     return None
 
-# ---- SQLite fallback ----
+# ---- SQLite fallback (utilise si Supabase non configure) ----
 import sqlite3
 DB_PATH = Path(__file__).with_name("data.db")
 
