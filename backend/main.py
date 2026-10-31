@@ -1,4 +1,5 @@
-﻿import hashlib
+﻿# Version: 1.2.0 - Fraude Scanner | Les Phoenix | Hackathon LBS 2026
+import hashlib
 import hmac
 import json
 import os
